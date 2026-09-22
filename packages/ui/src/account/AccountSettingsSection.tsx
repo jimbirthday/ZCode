@@ -241,13 +241,19 @@ export function AccountSettingsSection() {
         ) : null}
       </SettingsGroupCard>
       <SettingsGroupCard>
-        {view.entitlements.length === 0 && view.plans.length === 0 ? (
-          <SettingsRow
-            label={intl.formatMessage({ id: "settings.account.sharedTitle" })}
-            description={intl.formatMessage({ id: "settings.account.sharedEmpty" })}
-            control={<span className="text-ui-base text-foreground-subtle">—</span>}
-          />
-        ) : null}
+        <SettingsRow
+          label={intl.formatMessage({ id: "settings.account.sharedTitle" })}
+          description={
+            view.entitlements.length === 0 && view.plans.length === 0
+              ? intl.formatMessage({ id: "settings.account.sharedEmpty" })
+              : undefined
+          }
+          control={
+            <span className="text-ui-base text-foreground-subtle" data-testid="account-shared-count">
+              {view.entitlements.length}
+            </span>
+          }
+        />
         {view.entitlements.map((item) => (
           <SettingsRow
             key={item.id}
