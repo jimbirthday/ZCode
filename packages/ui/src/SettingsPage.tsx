@@ -70,6 +70,7 @@ import { PluginsSection } from "@/settings/PluginsSection.js";
 import { HooksSection } from "@/settings/HooksSection.js";
 import { PromptProfilesSection } from "@/settings/PromptProfilesSection.js";
 import { WorkspaceFileSearchSection } from "@/settings/WorkspaceFileSearchSection.js";
+import { AccountSettingsSection } from "@/account/AccountSettingsSection.js";
 import { MemorySettingsSection } from "@/settings/MemorySettingsSection.js";
 import { BrowserSettingsSection } from "@/settings/BrowserSettingsSection.js";
 import { ComputerUseSection } from "@/settings/ComputerUseSection.js";
@@ -1646,7 +1647,11 @@ export function SettingsPage({
                         ) : null}
                       </div>
                       <div className="space-y-8">
-                        {activeSection === "general" ? (
+                        {activeSection === "account" ? (
+                          <ServiceProvider services={localHostServices}>
+                            <AccountSettingsSection />
+                          </ServiceProvider>
+                        ) : activeSection === "general" ? (
                           <GeneralSectionContent
                             localePreference={localePreference}
                             interfaceMode={interfaceMode}

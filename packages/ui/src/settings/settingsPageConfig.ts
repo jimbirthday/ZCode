@@ -3,6 +3,7 @@ import {
   Moon,
   Settings,
   Settings2,
+  Wallet,
   Package,
   Bot,
   Palette,
@@ -61,6 +62,12 @@ const BASE_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     id: "general",
     icon: Settings2,
     titleId: "settings.systemTitle",
+    groupId: "basics",
+  },
+  {
+    id: "account",
+    icon: Wallet,
+    titleId: "settings.accountTitle",
     groupId: "basics",
   },
   {
