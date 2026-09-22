@@ -79,6 +79,9 @@ export async function createWorkspaceZCodeApp(
     providerRuntimeHeadersPort,
     runtimeConfig: {
       ...options.runtimeConfig,
+      ...(context.promptProfilePublication
+        ? { promptProfiles: context.promptProfilePublication.profiles }
+        : {}),
       // createZCodeApp 会把 workingDirectory 规范化为执行 cwd。把协议入口的
       // workspacePath 单独注入 runtime，session 持久化才能保留本地 workspaceKey 的路径表示。
       workspacePath: workspace.workspacePath,

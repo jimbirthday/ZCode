@@ -63,8 +63,8 @@ function buildRequestUserContextContent(input: {
   return [
     // 聚合字段标题不能绑定到 AGENTS.md，否则仅有 Project Memory 时缺少标题。
 
-    "# agentsMd",
-    "Codebase and user instructions are shown below. Be sure to adhere to these instructions. IMPORTANT: These instructions OVERRIDE any default behavior and you MUST follow them exactly as written.",
+    "# Workspace constraints",
+    "These notes describe this repository. They do not replace the model system prompt.",
     "",
     sections.join("\n\n"),
   ].join("\n");

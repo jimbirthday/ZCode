@@ -93,6 +93,27 @@ export async function getSkillCatalog(
   };
 }
 
+function modelQueryForPromptProfile(
+  runtime: AgentRuntimeInternal,
+  model?: Model,
+): { providerId: string; modelId: string } | undefined {
+  if (model?.providerId && model.modelId) {
+    return { providerId: model.providerId, modelId: model.modelId };
+  }
+  const selection = runtime.config.modelSelection;
+  if (selection?.providerId && selection.modelId) {
+    return { providerId: selection.providerId, modelId: selection.modelId };
+  }
+  return undefined;
+}
+
+function modelFromQuery(
+  query: { providerId: string; modelId: string } | undefined,
+): Model | undefined {
+  if (!query) return undefined;
+  return { providerId: query.providerId, modelId: query.modelId } as Model;
+}
+
 export function createContextBuilderFromSnapshot(
   this: AgentRuntimeInternal,
   snapshot: ContextSourceSnapshot,
@@ -107,12 +128,14 @@ export function createContextBuilderFromSnapshot(
     // 执行模型属于 model step，不写回可复用的 Context Source。
     this.config.envInfo = envInfo;
   }
+  const modelQuery = modelQueryForPromptProfile(this, options.model);
   if (this.config.subagentContext) {
     return createSubagentContextBuilder({
       agentPrompt: this.config.subagentContext.agentPrompt,
       currentDate: snapshot.currentDate,
       envInfo,
-      model: options.model,
+      model: options.model ?? modelFromQuery(modelQuery),
+      promptProfiles: this.config.promptProfiles,
       skillMetadataBudget: this.config.skillMetadataBudget,
       skills: this.skillLoadOutcome,
       userInstructions: this.config.subagentContext.userInstructions,
@@ -134,6 +157,8 @@ export function createContextBuilderFromSnapshot(
     embeddedSearchEnabled: resolveRuntimeEmbeddedSearchEnabled(this),
     skillMetadataBudget: this.config.skillMetadataBudget,
     customSystemPrompt: this.config.systemPrompt,
+    promptProfiles: this.config.promptProfiles,
+    modelQuery,
     workflowActor: this.config.workflowActor,
     language: this.config.language,
     outputStyle: this.config.outputStyle,

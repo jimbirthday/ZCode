@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- zcode-cli 配置 schema 需要集中维护文件解析和 provider 继承，拆散会让配置语义更难对齐。 */
+import { promptProfileSchema } from "@zcode/shared";
 import { z } from "zod";
 import type { RuntimeConfigPatch } from "@zcode/contracts";
 
@@ -302,6 +303,7 @@ export const ZCodeConfigFileSchema = z
     toolConcurrency: toolConcurrencySchema.optional(),
     modelAnomalyGuard: modelAnomalyGuardSchema.optional(),
     hooks: hooksSchema.optional(),
+    promptProfiles: z.array(promptProfileSchema).optional(),
   })
   .passthrough();
 
@@ -419,6 +421,7 @@ function parsedConfigFileToRuntimePatch(parsed: ZCodeConfigFile): RuntimeConfigP
   if (parsed.toolConcurrency) config.toolConcurrency = parsed.toolConcurrency;
   if (parsed.modelAnomalyGuard) config.modelAnomalyGuard = parsed.modelAnomalyGuard;
   if (parsed.hooks) config.hooks = parsed.hooks;
+  if (parsed.promptProfiles) config.promptProfiles = parsed.promptProfiles;
 
   return config;
 }

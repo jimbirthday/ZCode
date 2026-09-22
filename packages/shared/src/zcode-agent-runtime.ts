@@ -25,14 +25,14 @@ export function resolvePlatformBinaryName(binaryName: string, platform: string):
 
 export const ZCODE_AGENT_RUNTIME: ZCodeAgentRuntimeDescriptor = {
   binaryKind: "native-binary",
-  binaryEnvVar: "GLM_BINARY_PATH",
-  bundledResourceDir: "glm",
+  binaryEnvVar: "ZCODE_AGENT_BINARY",
+  bundledResourceDir: "agent",
   version: "0.13.3",
   spawnArgs: ["app-server", "--stdio"],
   nativeConfigDir: ".zcode/cli",
   nativeConfigFileName: "config.json",
   missingBinaryMessage:
-    "[ZCode Agent] glm binary 未找到，请设置 GLM_BINARY_PATH 或先准备 GLM 运行时资源",
+    "[ZCode Agent] bundled agent runtime was not found. Set ZCODE_AGENT_BINARY or prepare the agent resource.",
   resolveEntrySegments: (platform) => [resolvePlatformBinaryName("zcode-agent", platform)],
   nodeBundleEntryFile: "zcode.cjs",
   resolveNodeBundleSegments() {

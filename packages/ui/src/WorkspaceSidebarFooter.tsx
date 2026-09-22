@@ -64,7 +64,7 @@ function getSidebarProfileName(user?: UserInfo | null): string {
     return username;
   }
 
-  return "ZCode";
+  return "mgcode";
 }
 
 function getSidebarProfileBadge(
@@ -79,8 +79,8 @@ function getSidebarProfileBadge(
 }
 
 function getAvatarFallbackText(user: UserInfo | null | undefined): string {
-  const source = user?.displayName?.trim() || user?.username?.trim() || "Z";
-  return source[0]?.toUpperCase() ?? "Z";
+  const source = user?.displayName?.trim() || user?.username?.trim() || "M";
+  return source[0]?.toUpperCase() ?? "M";
 }
 
 export const WorkspaceSidebarFooter = memo(function WorkspaceSidebarFooterComponent({
@@ -270,6 +270,11 @@ export const WorkspaceSidebarFooter = memo(function WorkspaceSidebarFooterCompon
                   <DropdownMenuRadioItem value="system">
                     {intl.formatMessage({
                       id: "sidebar.settings.systemDefault",
+                    })}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="mango">
+                    {intl.formatMessage({
+                      id: "sidebar.settings.theme.mango",
                     })}
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="zai-dark">

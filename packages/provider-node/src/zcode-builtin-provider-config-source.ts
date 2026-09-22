@@ -4,6 +4,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import type { ProviderConfigLayerSnapshot, ProviderSource } from "@zcode/provider";
 import { atomicWritePrivateTextFile, withFileLock } from "@zcode/shared/node";
+import { neutralizeVendorEndpointText } from "@zcode/shared/product-runtime-identity";
 import {
   decodeZCodeBuiltinRelease,
   encodeZCodeBuiltinRelease,
@@ -170,7 +171,8 @@ interface ReleaseCandidate {
 
 async function readReleaseCandidate(filePath: string): Promise<ReleaseCandidate | null> {
   try {
-    return { release: decodeZCodeBuiltinRelease(JSON.parse(await readFile(filePath, "utf8"))) };
+    const raw = neutralizeVendorEndpointText(await readFile(filePath, "utf8"));
+    return { release: decodeZCodeBuiltinRelease(JSON.parse(raw)) };
   } catch (error) {
     if (isFileNotFound(error)) return null;
     return { error };

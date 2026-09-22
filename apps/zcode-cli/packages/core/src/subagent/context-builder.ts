@@ -14,12 +14,18 @@ import { buildRequestUserContextSection } from "../context/sections/request-user
 import { buildSkillsSection } from "../context/sections/skills.js";
 import { estimateTokens } from "../context/utils.js";
 import { buildSubagentCommonNotes, buildSubagentEnvironmentContext } from "./system-prompt.js";
+import {
+  assembleModelPrompt,
+  resolveModelPromptProfile,
+  type ModelPromptProfile,
+} from "../context/prompt-profile.js";
 
 export interface SubagentContextBuilderConfig {
   agentPrompt: string;
   currentDate?: string;
   envInfo: EnvInfo;
   model?: Model;
+  promptProfiles?: readonly ModelPromptProfile[];
   skillMetadataBudget?: number;
   skills?: ContextBuilderConfig["skills"];
   userInstructions?: ContextBuilderConfig["userInstructions"];
@@ -104,6 +110,46 @@ export function createSubagentContextBuilder(
 }
 
 function buildSubagentContextSections(config: SubagentContextBuilderConfig): ContextSection[] {
+  const profile =
+    config.model && config.promptProfiles
+      ? resolveModelPromptProfile(config.promptProfiles, {
+          providerId: config.model.providerId,
+          modelId: config.model.modelId,
+        })
+      : undefined;
+  if (profile) {
+    const assembled = assembleModelPrompt({
+      profile,
+      roleAddendum: config.agentPrompt,
+      workspaceInstructions: config.userInstructions?.content,
+      contract: {
+        toolNames: [],
+        permissionNote:
+          "A denied tool call means the user or the sandbox declined it. Do not retry it verbatim.",
+        env: `Working directory: ${config.envInfo.cwd}`,
+        date: config.currentDate,
+      },
+    });
+    const sections: ContextSection[] = [
+      createSubagentSection({
+        name: "Model Prompt Profile",
+        source: "subagent_agent_prompt",
+        cacheHint: "stable",
+        content: assembled.systemText,
+      }),
+    ];
+    if (assembled.workspaceConstraint) {
+      sections.push(
+        createSubagentSection({
+          name: "Workspace constraints",
+          source: "request_user_context",
+          cacheHint: "dynamic",
+          content: `\n\n${assembled.workspaceConstraint}`,
+        }),
+      );
+    }
+    return sections;
+  }
   const sections: ContextSection[] = [buildCliPrefixSection()];
   const agentPrompt = config.agentPrompt.trimEnd();
   if (agentPrompt) {

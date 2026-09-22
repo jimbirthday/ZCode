@@ -138,6 +138,8 @@ export interface ZCodeProtocolAgentServerContext {
      */
     dynamicWorkflowEnabled: boolean;
   };
+  /** Host 在本进程发布过模型提示词目录后，新建会话用这份，不再回读启动时的文件副本。 */
+  promptProfilePublication?: { profiles: import("@zcode/shared").PromptProfile[] };
   // 竖切：v4 conversation 通道（订阅/帧/命令），与旧 session/* 方法并存。
   // 构造顺序问题（gateway 闭包持有 context）用可选字段收口，server 构造完立即赋值。
   v4Gateway?: ConversationV4Gateway;

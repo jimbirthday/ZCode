@@ -123,6 +123,7 @@ export function createScriptWorkflowAgentRuntime(input: {
       toolAllowlist: input.request.opts?.tools,
       workingDirectory: input.deps.workingDirectory,
       ...input.configOverrides,
+      promptProfiles: input.deps.runtimeConfig.promptProfiles,
     },
     {
       ...createRuntimeDeps(input.deps, input.traceContext, input.childSessionId, {

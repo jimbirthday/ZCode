@@ -322,6 +322,8 @@ import { IPluginManagementService } from "./plugins/pluginManagement.js";
 import { ISubagentsService } from "./subagents/subagents.js";
 import { ICommandsService } from "./commands/commands.js";
 import { IHooksService } from "./hooks/hooks.js";
+import { IPromptProfileService } from "./prompt-profiles/promptProfiles.js";
+import { createPromptProfileService } from "./prompt-profiles/promptProfileService.js";
 import { IMemoryService } from "./memory/memory.js";
 import { ISettingsSyncService } from "./settings-sync/settingsSync.js";
 import { IFeedbackService } from "./feedback/feedback.js";
@@ -1661,6 +1663,9 @@ export function createLocalServices(options: {
   const hooksService = createHooksService({
     grantWorkspaceHookTrust: (params) => zcodeAgentService.grantWorkspaceHookTrust(params),
   });
+  const promptProfileService = createPromptProfileService({
+    applyToRunningAgents: (profiles) => zcodeAgentService.applyPromptProfiles(profiles),
+  });
   const memoryService = createMemoryService();
   // 只要当前进程已经装配 Provider Runtime，就由该 Environment 自己的 Selection View
   // 决定执行就绪状态。Desktop-attached remote 也读取远端自己的 Config/Account Facts。
@@ -2560,6 +2565,7 @@ export function createLocalServices(options: {
       }),
     )
     .register(IMemoryService, createMemoryService())
+    .register(IPromptProfileService, promptProfileService)
     .register(ISettingsSyncService, createSettingsSyncService({ settingService }))
     .register(
       IFeedbackService,

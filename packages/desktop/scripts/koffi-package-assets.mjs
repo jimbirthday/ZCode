@@ -71,7 +71,7 @@ export function verifyStagedKoffi({
   pluginRelativePath = "packages/zcode-cua-plugin",
 }) {
   const platformKey = koffiPlatformKey(targetPlatform);
-  const koffiRoot = resolve(resourcesDir, "glm", pluginRelativePath, "node_modules", "koffi");
+  const koffiRoot = resolve(resourcesDir, "agent", pluginRelativePath, "node_modules", "koffi");
   const nativePath = resolve(koffiRoot, "build", "koffi", platformKey, "koffi.node");
   return existsSync(nativePath) && existsSync(resolve(koffiRoot, "index.js"))
     ? []

@@ -43,8 +43,23 @@ rm -rf "$TARGET.new"
 ln -sfn "$TARGET" "$INSTALL_DIR/current"
 
 cat > "$BIN_DIR/zcode" <<SH
-#!/usr/bin/env sh
-exec node "$INSTALL_DIR/current/bin/zcode.mjs" "\\$@"
+#!/bin/sh
+set -eu
+ROOT="$INSTALL_DIR/current"
+if [ -x "\\$ROOT/runtime/node" ]; then
+  exec "\\$ROOT/runtime/node" "\\$ROOT/agent/zcode.cjs" "\\$@"
+fi
+if [ -x "\\$ROOT/runtime/node.exe" ]; then
+  exec "\\$ROOT/runtime/node.exe" "\\$ROOT/agent/zcode.cjs" "\\$@"
+fi
+if [ -x "\\$ROOT/runtime/bin/node" ]; then
+  exec "\\$ROOT/runtime/bin/node" "\\$ROOT/agent/zcode.cjs" "\\$@"
+fi
+if [ -x "\\$ROOT/runtime/bin/node.exe" ]; then
+  exec "\\$ROOT/runtime/bin/node.exe" "\\$ROOT/agent/zcode.cjs" "\\$@"
+fi
+echo "zcode bundled runtime is missing" >&2
+exit 127
 SH
 chmod +x "$BIN_DIR/zcode"
 

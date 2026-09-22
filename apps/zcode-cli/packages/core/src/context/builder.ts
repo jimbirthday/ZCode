@@ -27,6 +27,7 @@ import {
   buildOutputStyleSection,
   buildSessionGuidanceSection,
 } from "./dynamic-sections.js";
+import { assembleModelPrompt, resolveModelPromptProfile } from "./prompt-profile.js";
 
 // -----------------------------------------------
 // Context Builder
@@ -96,16 +97,51 @@ export class ContextBuilder {
       );
     }
     const isWorkflowActor = workflowActor !== undefined;
+    const resolvedProfile = this.config.modelQuery
+      ? resolveModelPromptProfile(this.config.promptProfiles ?? [], this.config.modelQuery)
+      : undefined;
+    const profileAssembly = resolvedProfile
+      ? assembleModelPrompt({
+          profile: resolvedProfile,
+          roleAddendum: isWorkflowActor
+            ? workflowActor?.persona?.trim() || workflowActor?.name
+            : undefined,
+          workspaceInstructions: this.config.userInstructions?.content,
+          contract: {
+            toolNames: this.config.guidanceToolNames ?? [],
+            permissionNote:
+              "A denied tool call means the user or the sandbox declined it. Do not retry it verbatim.",
+            ...(this.config.presentationSurface === "zcode_desktop"
+              ? {
+                  desktopDirective:
+                    "Desktop file references use Markdown links. Inline review uses ::code-comment{title, body, file, start, end, priority}.",
+                }
+              : {}),
+            env: this.config.envInfo?.cwd ? `Working directory: ${this.config.envInfo.cwd}` : undefined,
+            date: this.config.currentDate,
+          },
+        })
+      : undefined;
 
     // 1. CLI / product prefix. Keep this as the short leading identity block.
     // 「You are ZCode, an interactive coding agent」对一个
     // 只对脚本说话、可能连读文件工具都没有的子代理是错的身份，且走在正确身份段前面。
-    if (!isWorkflowActor) {
+    if (!isWorkflowActor && !profileAssembly) {
       sections.push(buildCliPrefixSection());
     }
 
     // 2. Stable agent behavior or custom prompt body
-    if (hasCustomSystemPrompt) {
+    if (profileAssembly) {
+      sections.push(
+        createSection({
+          name: "Model Prompt Profile",
+          source: "custom_system_prompt",
+          injectionTarget: "system",
+          cacheHint: "stable",
+          content: profileAssembly.systemText,
+        }),
+      );
+    } else if (hasCustomSystemPrompt) {
       sections.push(
         createSection({
           name: "Custom System Prompt",
@@ -127,7 +163,7 @@ export class ContextBuilder {
     // custom prompt 后仍会混入 Session Guidance / output style 等动态 system 段。
     // 工作流子代理跳过其中面向「与用户对话」的三段（desktop、Dynamic Behavior、session
     // guidance——契约里已把 Report outcomes faithfully 搬过去），保留 memory 与其后各段。
-    if (!hasCustomSystemPrompt) {
+    if (!hasCustomSystemPrompt && !profileAssembly) {
       if (!isWorkflowActor && this.config.presentationSurface === "zcode_desktop") {
         sections.push(buildDesktopContextSection());
       }
@@ -176,7 +212,7 @@ export class ContextBuilder {
     // guidanceToolNames 是 runtime 当下的
     // 工具表；一个 Skill 工具未注册的工作流子代理被告知「以下技能可经 Skill 工具使用」，
     // 只会让它相信自己有一个没有的工具。表缺席（测试 / 旧调用方）时保持既有行为。
-    if (this.config.skills && this.skillToolAvailable()) {
+    if (this.config.injectSkillListing === true && this.config.skills && this.skillToolAvailable()) {
       const skillsSection = buildSkillsSection({
         outcome: this.config.skills,
         metadataBudget: this.config.skillMetadataBudget,
@@ -187,11 +223,25 @@ export class ContextBuilder {
     }
 
     // 5. Meta user context: workspace instructions/project memory first, date second.
-    const requestUserContextSection = buildRequestUserContextSection({
-      userInstructions: this.config.userInstructions,
-      memoryIndexContent: this.config.memoryIndexContent,
-      memoryRoot: this.config.memoryRoot,
-    });
+    const requestUserContextSection = profileAssembly
+      ? null
+      : buildRequestUserContextSection({
+          userInstructions: this.config.userInstructions,
+          memoryIndexContent:
+            this.config.injectMemoryIndex === true ? this.config.memoryIndexContent : undefined,
+          memoryRoot: this.config.injectMemoryIndex === true ? this.config.memoryRoot : undefined,
+        });
+    if (profileAssembly?.workspaceConstraint) {
+      sections.push(
+        createSection({
+          name: "Workspace constraints",
+          source: "request_user_context",
+          injectionTarget: "meta_user",
+          cacheHint: "dynamic",
+          content: profileAssembly.workspaceConstraint,
+        }),
+      );
+    }
     if (requestUserContextSection) {
       sections.push(requestUserContextSection);
     }

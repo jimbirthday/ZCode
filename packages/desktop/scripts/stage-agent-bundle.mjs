@@ -1,5 +1,5 @@
 // Agent bundle 的暂存动作：把 apps/zcode-cli/packages/cli/dist/zcode.cjs 放进
-// bundled-agents/<平台>/glm，并写 meta。
+// bundled-agents/<平台>/agent，并写 meta。打包目标是 resources/agent。
 //
 // dev 与打包**必须**用同一份暂存实现。
 // 只有打包链（prepare-agent-node-bundle.mjs）会暂存是不够的，dev 链
@@ -14,30 +14,30 @@ import { resolve } from "node:path";
 export const AGENT_BUNDLE_SOURCE_RELATIVE = "apps/zcode-cli/packages/cli/dist/zcode.cjs";
 
 export function resolveAgentBundlePaths({ repoRoot, platformKey }) {
-  const glmDir = resolve(repoRoot, "packages", "desktop", "bundled-agents", platformKey, "glm");
+  const agentDir = resolve(repoRoot, "packages", "desktop", "bundled-agents", platformKey, "agent");
   return {
     cliBundlePath: resolve(repoRoot, AGENT_BUNDLE_SOURCE_RELATIVE),
-    glmDir,
-    stagedBundlePath: resolve(glmDir, "zcode.cjs"),
-    stagedMetaPath: resolve(glmDir, ".node-bundle-meta.json"),
+    agentDir,
+    stagedBundlePath: resolve(agentDir, "zcode.cjs"),
+    stagedMetaPath: resolve(agentDir, ".node-bundle-meta.json"),
   };
 }
 
 /**
- * 干净重建 glm 目录再拷贝。清空是刻意的：electron-builder 整目录拷贝
- * bundled-agents/<平台>/glm → resources/glm，本地工作树里上一次构建残留的原生二进制
+ * 干净重建 agent 目录再拷贝。清空是刻意的：electron-builder 整目录拷贝
+ * bundled-agents/<平台>/agent → resources/agent，本地工作树里上一次构建残留的原生二进制
  * （zcode-agent / zcode-acp 等）和旧 meta 会被一并打进安装包（CI 干净检出不会有，本地会）。
  */
 export function stageAgentBundle({ repoRoot, platformKey, log = console.log }) {
-  const { cliBundlePath, glmDir, stagedBundlePath, stagedMetaPath } = resolveAgentBundlePaths({
+  const { cliBundlePath, agentDir, stagedBundlePath, stagedMetaPath } = resolveAgentBundlePaths({
     repoRoot,
     platformKey,
   });
   if (!existsSync(cliBundlePath)) {
     throw new Error(`[stage:agent-bundle] agent bundle 源产物不存在：${cliBundlePath}`);
   }
-  rmSync(glmDir, { recursive: true, force: true });
-  mkdirSync(glmDir, { recursive: true });
+  rmSync(agentDir, { recursive: true, force: true });
+  mkdirSync(agentDir, { recursive: true });
   copyFileSync(cliBundlePath, stagedBundlePath);
   const meta = {
     runtime: "electron-node",

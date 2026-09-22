@@ -148,6 +148,10 @@ export function mergeConfigs(...configs: PrioritizedConfig[]): RuntimeConfigPatc
     if (config.ui) {
       result.ui = { ...result.ui, ...config.ui };
     }
+    // 高优先级来源整体替换目录，不能在 Object.assign 之后丢掉。
+    if (config.promptProfiles !== undefined) {
+      result.promptProfiles = config.promptProfiles;
+    }
   }
 
   return result;

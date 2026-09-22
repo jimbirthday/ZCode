@@ -620,12 +620,10 @@ export default {
         ]
       : []),
     {
-      // agent 运行时资产，打包到 resources/glm。
-      // 桌面端内置的是 agent 的 JS bundle（glm/zcode.cjs，由 prepare:agent-bundle 生成），
-      // Host 进程用 app 自带的 Electron Node runtime（ELECTRON_RUN_AS_NODE）执行 `zcode.cjs app-server --stdio`，
-      // 不再随包内置独立 Node 二进制。远端 SSH/WSL 仍走原生二进制（无 Electron）。
-      from: `bundled-agents/${targetPlatform.key}/glm`,
-      to: "glm",
+      // agent 运行时资产，打包到 resources/agent，不是 resources/glm。
+      // Host 用 Electron Node 执行 resources/agent/zcode.cjs app-server --stdio。
+      from: `bundled-agents/${targetPlatform.key}/agent`,
+      to: "agent",
       filter: ["**/*", "!**/*.map"],
     },
     {

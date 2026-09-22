@@ -212,6 +212,10 @@ class ConfigStore {
     if (config.ui?.theme !== undefined) {
       this.set(ConfigKey.UiTheme, config.ui.theme, scope);
     }
+    // 解析后的 promptProfiles 必须进 store。只留在 patch 上时 getAll 看不到，运行时目录为空。
+    if (config.promptProfiles !== undefined) {
+      this.set(ConfigKey.PromptProfiles, config.promptProfiles, scope);
+    }
   }
 
   subscribe<K extends ConfigKey>(key: K, handler: Handler<K>): Unsubscribe {
@@ -257,6 +261,7 @@ export class ConfigPortImpl implements ConfigPort {
 
   getAll(): RuntimeConfig {
     return {
+      promptProfiles: this.store.get(ConfigKey.PromptProfiles) ?? DefaultConfig.promptProfiles,
       modelStream: {
         idleTimeoutMs:
           this.store.get(ConfigKey.ModelStreamIdleTimeout) ??
@@ -443,6 +448,8 @@ function getDefaultValue(key: ConfigKey): unknown {
       return defaults.ui.locale;
     case ConfigKey.UiTheme:
       return defaults.ui.theme;
+    case ConfigKey.PromptProfiles:
+      return defaults.promptProfiles;
     default:
       return undefined;
   }

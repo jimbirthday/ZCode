@@ -24,6 +24,7 @@ import { z } from "zod";
 export * from "../process-diagnostic.js";
 import { errorAttributionSchema } from "../zcode-protocol-v4/snapshot.js";
 import { modelSelectionSchema } from "../model-selection.js";
+import { promptProfileCatalogSchema } from "../prompt-profiles.js";
 import { completeModelPropertiesDataSchema } from "../model-config.js";
 import { accountProviderUnavailableReasonSchema } from "../account-provider-state.js";
 import { modelExecutionSchema } from "../model-execution.js";
@@ -2200,6 +2201,26 @@ export const zcodeWorkspaceUpdateInteractionPreferencesResultSchema = z
     snoozedInteractionCount: z.number().int().nonnegative(),
   })
   .strict();
+
+export const zcodeWorkspaceUpdatePromptProfilesParamsSchema = z
+  .object({
+    workspace: zcodeWorkspaceRefSchema,
+    profiles: promptProfileCatalogSchema,
+  })
+  .strict();
+export type ZCodeWorkspaceUpdatePromptProfilesParams = z.infer<
+  typeof zcodeWorkspaceUpdatePromptProfilesParamsSchema
+>;
+
+export const zcodeWorkspaceUpdatePromptProfilesResultSchema = z
+  .object({
+    profileCount: z.number().int().nonnegative(),
+    updatedSessionCount: z.number().int().nonnegative(),
+  })
+  .strict();
+export type ZCodeWorkspaceUpdatePromptProfilesResult = z.infer<
+  typeof zcodeWorkspaceUpdatePromptProfilesResultSchema
+>;
 export type ZCodeWorkspaceUpdateInteractionPreferencesResult = z.infer<
   typeof zcodeWorkspaceUpdateInteractionPreferencesResultSchema
 >;
@@ -3599,6 +3620,7 @@ export const zcodeProtocolMethods = {
   // 进程级 Account Provider Config 与 workspace 运行目录分离。
   providerUpdateAccountConfig: "provider/updateAccountConfig",
   workspaceUpdateInteractionPreferences: "workspace/updateInteractionPreferences",
+  workspaceUpdatePromptProfiles: "workspace/updatePromptProfiles",
   workspaceUpdateModelIoPreferences: "workspace/updateModelIoPreferences",
   // Off-Peak 工具面门禁是 workspace 级事实（灰度 + 本地/远程），由 host 在 agent 就绪时同步；
   // CLI 对 legacy create/resume 与 v4 冷恢复统一读取。旧 CLI method-not-found → host 降级忽略。

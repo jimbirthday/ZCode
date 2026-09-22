@@ -2051,3 +2051,172 @@ body {
 .prompt-mention[data-mention-category="plugins"]::before {
   border-radius: var(--radius-sm);
 }
+
+/* Custom theme documents drive more than color. These tokens are written by the
+   theme applicator and change type size, spacing, corners, and motion together. */
+html[data-theme-applied="custom"] {
+  font-family: var(--theme-font-family), sans-serif;
+}
+html[data-theme-applied="custom"] #root {
+  font-size: var(--ui-font-size);
+}
+html[data-theme-applied="custom"] button,
+html[data-theme-applied="custom"] input,
+html[data-theme-applied="custom"] textarea,
+html[data-theme-applied="custom"] [data-slot="card"] {
+  border-radius: var(--theme-radius);
+  transition-duration: var(--theme-motion-duration);
+  transition-timing-function: var(--theme-motion-easing);
+}
+html[data-theme-applied="custom"] .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: calc(0.75rem * var(--theme-density, 1));
+}
+
+/* 芒果 Midnight Anime：夜空蓝层级承载长时间阅读，芒果黄只用于动作与当前态。 */
+html.theme-mango {
+  --color-background: #0b1020;
+  --color-background-win-alt: #080d1a;
+  --color-background-alt: #101a30;
+  --color-header: #131f38;
+  --color-panel: #131f38;
+  --color-sidebar: #0d162b;
+  --color-brand: #ffb703;
+  --color-accent: #1b3557;
+  --color-border: #304a6b;
+  --color-border-hover: #537396;
+  --color-hover: #1a3150;
+  --color-selected: #174d69;
+  --color-surface: #142541;
+  --color-surface-hover: #1d3b5a;
+  --color-card: #172b49;
+  --color-card-selected: #174d69;
+  --color-card-border: #304a6b;
+  --color-popover: #172b49;
+  --color-popover-foreground: #fff6df;
+  --color-popover-header: #131f38;
+  --color-popover-border: #537396;
+  --color-input: #0d1a30;
+  --color-input-focused: #142541;
+  --color-input-border: #537396;
+  --color-input-border-hover: #7dd3fc;
+  --color-input-border-focused: #7dd3fc;
+  --color-primary: #ffb703;
+  --color-primary-foreground: #211506;
+  --color-secondary: #294260;
+  --color-foreground: #fff8e7;
+  --color-foreground-subtle: #c9d8ea;
+  --color-foreground-subtlest: #afc3db;
+  --color-foreground-inverse: #0b1020;
+  --color-icon-blue: #7dd3fc;
+  --color-trajectory-user: #7dd3fc;
+  --color-trajectory-assistant: #7fe3c2;
+  --color-trajectory-reasoning: #c2a6ff;
+  --color-trajectory-tool-call: #ffd56a;
+  --color-trajectory-tool-result: #7dd3fc;
+  --color-find-highlight: #4a3d17;
+  --color-find-highlight-active: #7d641a;
+  --color-warning: #ffd166;
+  --color-warning-foreground: #211506;
+  --color-tab: #131f38;
+  --color-tab-active: #0b1020;
+  --color-menu: #172b49;
+  --color-menu-hover: #1d3b5a;
+  --color-toast: #172b49;
+  --color-tooltip: #294260;
+  --color-tooltip-foreground: #fff8e7;
+  --color-tooltip-tag: #131f38;
+  --color-tooltip-tag-foreground: #c9d8ea;
+  --color-tag: #294260;
+  --color-terminal-bg: #080d1a;
+  --color-terminal-fg: #fff8e7;
+  --color-terminal-cursor: #ffb703;
+  --color-terminal-cursor-accent: #0b1020;
+  --color-terminal-selection: #174d69;
+  --color-success: #80e0be;
+  --color-success-foreground: #0b1020;
+  --color-destructive: #ff7f8f;
+  --color-destructive-foreground: #0b1020;
+  --radius: 0.625rem;
+  --mango-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.theme-mango [data-workspace-sidebar-panel="true"] {
+  background-color: var(--color-sidebar);
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(13, 22, 43, 0.97) 0%,
+      rgba(13, 22, 43, 0.95) 54%,
+      rgba(13, 22, 43, 0.82) 100%
+    ),
+    url("./assets/mgcode-sidebar.png");
+  background-size: cover;
+  background-position: center bottom;
+}
+html.theme-mango [data-workspace-conversation-frame="true"] {
+  background-color: var(--color-background);
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(11, 16, 32, 0.99) 0%,
+      rgba(11, 16, 32, 0.97) 62%,
+      rgba(11, 16, 32, 0.9) 100%
+    ),
+    linear-gradient(180deg, #0b1020 0%, rgba(11, 16, 32, 0) 40%),
+    linear-gradient(90deg, #0b1020 0%, rgba(11, 16, 32, 0) 40%), url("./assets/mgcode-chat.png");
+  /* cover 会把角色随长会话放大到正文后方；将装饰限制在右下角。 */
+  background-size:
+    100% 100%,
+    720px 405px,
+    720px 405px,
+    720px 405px;
+  background-position:
+    center,
+    right bottom,
+    right bottom,
+    right bottom;
+  background-repeat: no-repeat;
+}
+
+/* Mango 的动效只移动合成层，首屏进入和按钮触感不改变布局尺寸。 */
+html.theme-mango [data-workspace-sidebar-panel="true"],
+html.theme-mango [data-workspace-conversation-frame="true"] {
+  animation: mango-panel-enter 420ms var(--mango-motion-ease) both;
+}
+html.theme-mango [data-slot="button"][data-variant="default"] {
+  transition: transform 180ms var(--mango-motion-ease);
+}
+html.theme-mango [data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 183, 3, 0.18);
+}
+html.theme-mango [data-slot="button"][data-variant="default"]:active:not(:disabled) {
+  transform: scale(0.97);
+}
+html.theme-mango :is(button, input, textarea, [role="button"]):focus-visible {
+  outline: 2px solid var(--color-input-border-focused);
+  outline-offset: 2px;
+}
+@keyframes mango-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 640px) {
+  html.theme-mango [data-workspace-conversation-frame="true"] {
+    background-image: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.theme-mango [data-workspace-sidebar-panel="true"],
+  html.theme-mango [data-workspace-conversation-frame="true"] {
+    animation: none;
+  }
+  html.theme-mango [data-slot="button"][data-variant="default"] {
+    transition: none;
+  }
+}

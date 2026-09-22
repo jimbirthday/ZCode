@@ -261,6 +261,7 @@ export function createDefaultSubagentPort(
           bashShellSelection,
           // child 只复用父 runtime 已解析的 instructions snapshot；Project Context 仍不继承。
           currentDate: this.contextSourceSnapshot?.currentDate ?? this.config.currentDate,
+          promptProfiles: this.config.promptProfiles,
           subagentContext: {
             agentPrompt: agentPrompt ?? "",
             ...(agentsMdInstructions ? { userInstructions: agentsMdInstructions } : {}),

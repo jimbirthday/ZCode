@@ -1,3 +1,5 @@
+import { browserThemeStorage, loadStoredThemeLibrary } from "@/theme/theme-library.js";
+import { CustomThemePanel } from "@/theme/CustomThemePanel.js";
 import type { Theme } from "@/useTheme.js";
 import { useState } from "react";
 import { resolveTheme } from "@/useTheme.js";
@@ -95,6 +97,9 @@ export function AppearanceSectionContent({
 }) {
   const { intl } = useZCodeIntl();
   const activePreviewMode = resolveTheme(theme);
+  const [customActive, setCustomActive] = useState(() =>
+    Boolean(loadStoredThemeLibrary(browserThemeStorage).activeId),
+  );
 
   return (
     <>
@@ -117,9 +122,17 @@ export function AppearanceSectionContent({
                 id: "settings.themeModeDescription",
               })}
               control={
-                <Select value={theme} onValueChange={(value) => setTheme(value as Theme)}>
+                <Select
+                  value={customActive ? "" : theme}
+                  onValueChange={(value) => {
+                    setCustomActive(false);
+                    setTheme(value as Theme);
+                  }}
+                >
                   <SelectTrigger size="lg" className="w-[260px] min-w-0 justify-between">
-                    <SelectValue />
+                    <SelectValue
+                      placeholder={intl.formatMessage({ id: "settings.customTheme.title" })}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {THEME_MODES.map(({ mode, icon: Icon }) => (
@@ -156,6 +169,7 @@ export function AppearanceSectionContent({
         </Card>
       </div>
 
+      <CustomThemePanel key={`${theme}-${customActive}`} onActiveChange={setCustomActive} />
       <div className="space-y-6">
         <div className="min-w-0 space-y-3">
           <div>

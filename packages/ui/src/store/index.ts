@@ -36,8 +36,9 @@ import {
   persistTaskNotificationEnabled,
   persistTaskNotificationSoundEnabled,
 } from "@/lib/taskNotificationPreferences.js";
-import type { Theme } from "../useTheme.js";
-import { applyTheme, normalizeThemePreference, resolveTheme } from "../useTheme.js";
+import type { Theme } from "../theme/theme-application.js";
+import { applyTheme, isTheme, normalizeThemePreference } from "../theme/theme-application.js";
+import { clearActiveCustomTheme, paintStoredCustomTheme } from "../theme/theme-library.js";
 
 import {
   INTERFACE_MODE_STORAGE_KEY,
@@ -252,14 +253,22 @@ export function createZCodeStore(
       writeSafeLocalStorage(INTERFACE_MODE_STORAGE_KEY, interfaceMode);
       set({ interfaceMode });
     },
-    // 默认主题统一收敛到 Zai dark，避免首次启动时 store 与其他主题入口表现不一致。
+    // 芒果仅作为缺省值；旧实现覆盖已保存的深色选择，导致重启后主题跳回。
     // 仍然优先尊重 localStorage 中已保存的用户选择，不覆盖已有偏好。
-    theme: normalizeThemePreference((readSafeLocalStorage("zcode-theme") as Theme) || "zai-dark"),
+    theme: normalizeThemePreference(
+      (() => {
+        const saved = readSafeLocalStorage("zcode-theme");
+        return isTheme(saved) ? saved : "mango";
+      })(),
+    ),
     setTheme: (theme: Theme) => {
+      if (!isTheme(theme)) return;
       const normalizedTheme = normalizeThemePreference(theme);
       writeSafeLocalStorage("zcode-theme", normalizedTheme);
+      clearActiveCustomTheme();
       syncSystemThemeListener(normalizedTheme);
       applyTheme(normalizedTheme);
+      applyUiFontSizePx(get().uiFontSizePx);
 
       set({ theme: normalizedTheme });
     },
@@ -414,6 +423,8 @@ export function createZCodeStore(
       // system 模式需要持续订阅系统亮暗变化，不能只在切换到 system 的瞬间应用一次。
       // 否则用户后续切系统主题时，DOM 上的 dark class 不会同步更新，看起来就像“跟随系统失效”。
       applyTheme("system");
+      applyUiFontSizePx(useStore.getState().uiFontSizePx);
+      paintStoredCustomTheme();
     };
 
     if (typeof mediaQuery.addEventListener === "function") {
@@ -491,10 +502,8 @@ export function createZCodeStore(
   syncSystemThemeListener(useStore.getState().theme);
   applyTheme(useStore.getState().theme);
   applyUiFontSizePx(useStore.getState().uiFontSizePx);
-  document.documentElement.classList.toggle(
-    "dark",
-    resolveTheme(useStore.getState().theme) === "dark",
-  );
+  // 内置主题和字号偏好会清掉自定义 token。已保存的自定义主题必须在这之后重画，字号也跟主题文档走。
+  paintStoredCustomTheme();
 
   return useStore;
 }

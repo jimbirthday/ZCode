@@ -77,6 +77,9 @@ export const ConfigKey = {
   // UI
   UiLocale: "ui.locale",
   UiTheme: "ui.theme",
+
+  // User-editable model system prompts
+  PromptProfiles: "promptProfiles",
 } as const;
 
 export type ConfigKey = (typeof ConfigKey)[keyof typeof ConfigKey];
@@ -148,7 +151,9 @@ export type ConfigValue<K extends ConfigKey> = K extends "modelStream.idleTimeou
                                                 ? UiLocale
                                                 : K extends "ui.theme"
                                                   ? UiThemePreference
-                                                  : unknown;
+                                                  : K extends "promptProfiles"
+                                                    ? ModelPromptProfileConfig[]
+                                                    : unknown;
 
 // ============================================================
 // Config Scope
@@ -255,6 +260,8 @@ export interface RuntimeConfig {
     locale: UiLocale;
     theme: UiThemePreference;
   };
+  /** User-editable model system prompts. Empty means no profile is selected. */
+  promptProfiles: ModelPromptProfileConfig[];
 }
 
 export interface RuntimeConfigPatch {
@@ -274,6 +281,16 @@ export interface RuntimeConfigPatch {
   modelAnomalyGuard?: Partial<RuntimeConfig["modelAnomalyGuard"]>;
   hooks?: HooksRuntimeConfigPatch;
   ui?: Partial<RuntimeConfig["ui"]>;
+  promptProfiles?: RuntimeConfig["promptProfiles"];
+}
+
+export interface ModelPromptProfileConfig {
+  id: string;
+  providerId?: string;
+  modelId?: string;
+  family?: string;
+  body: string;
+  language: string;
 }
 
 export type SupportedLocale = "en-US" | "zh-CN";
@@ -300,7 +317,7 @@ export const DefaultRuntimeConfig: RuntimeConfig = {
   },
   storage: {
     dir: "~/.zcode",
-    sessionDbPath: "~/.zcode/cli/db/db.sqlite",
+    sessionDbPath: "~/.zcode/sessions/db.sqlite",
   },
   network: {
     timeout: 180000,
@@ -309,12 +326,12 @@ export const DefaultRuntimeConfig: RuntimeConfig = {
     compact: true,
     rewind: true,
     subagent: true,
-    memory: true,
+    memory: false,
     skill: true,
     mcp: true,
   },
   memory: {
-    use: true,
+    use: false,
   },
   mcp: {
     servers: {},
@@ -356,6 +373,7 @@ export const DefaultRuntimeConfig: RuntimeConfig = {
     locale: "en-US",
     theme: "auto",
   },
+  promptProfiles: [],
 };
 
 // ============================================================

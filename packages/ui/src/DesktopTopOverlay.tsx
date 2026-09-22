@@ -141,8 +141,8 @@ export function DesktopTopOverlay({
             >
               <img
                 src={appLogoUrl}
-                alt="ZCode"
-                className="size-5 transition-opacity duration-150 group-hover:opacity-0"
+                alt="mgcode"
+                className="size-5 rounded-full object-cover object-top transition-opacity duration-150 group-hover:opacity-0"
                 draggable={false}
               />
               <SidebarToggleIcon className="absolute inset-0 m-auto size-4 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />

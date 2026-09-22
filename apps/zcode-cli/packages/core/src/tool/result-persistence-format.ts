@@ -1,8 +1,7 @@
+import { summarizeLargeToolResult } from "./large-tool-output.js";
+
 const PERSISTED_OUTPUT_OPEN_TAG = "<persisted-output>";
 const PERSISTED_OUTPUT_CLOSE_TAG = "</persisted-output>";
-// Artifact strategy uses resultBudget as the persistence trigger; once persisted, this independent
-// preview budget controls the provider-visible <persisted-output> snippet.
-const PERSISTED_OUTPUT_PREVIEW_CHARS = 2_000;
 
 interface PersistedOutputEnvelopeInput {
   content: string;
@@ -17,12 +16,10 @@ export function formatGenericPersistedOutputContent(input: {
   originalBytes: number;
   persistedPath: string;
 }): string {
-  return formatPersistedOutputEnvelope({
+  return summarizeLargeToolResult({
     content: input.content,
-    formatBytes: formatDecimalBytes,
     originalBytes: input.originalBytes,
-    persistedPath: input.persistedPath,
-    previewChars: PERSISTED_OUTPUT_PREVIEW_CHARS,
+    path: input.persistedPath,
   });
 }
 
@@ -61,9 +58,4 @@ function previewFirstChars(
   };
 }
 
-function formatDecimalBytes(bytes: number): string {
-  if (bytes < 1_000) return `${bytes} B`;
-  if (bytes < 1_000_000) return `${Math.round(bytes / 1_000)} KB`;
-  if (bytes < 1_000_000_000) return `${Math.round(bytes / 1_000_000)} MB`;
-  return `${Math.round(bytes / 1_000_000_000)} GB`;
-}
+

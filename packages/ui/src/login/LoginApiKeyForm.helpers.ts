@@ -7,21 +7,21 @@ import {
 import type { ModelSelectionView } from "@zcode/services";
 import { encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
 
-export type ApiKeyProviderChoice = "zai" | "bigmodel";
+export type ApiKeyProviderChoice = "mgoole" | "zai" | "bigmodel";
 
-export function resolveLoginApiKeyDefaultProvider(locale: Locale): ApiKeyProviderChoice {
-  return locale === "zh-CN" ? "bigmodel" : "zai";
+export function resolveLoginApiKeyDefaultProvider(_locale: Locale): ApiKeyProviderChoice {
+  return "mgoole";
 }
 
-export function resolveLoginApiKeyTemplateId(
-  choice: ApiKeyProviderChoice,
-): "zai-api" | "bigmodel-api" {
+export function resolveLoginApiKeyTemplateId(choice: ApiKeyProviderChoice): string {
+  if (choice === "mgoole") return "mgoole";
   return choice === "zai"
     ? BUILTIN_PROVIDER_TEMPLATE_IDS.zai
     : BUILTIN_PROVIDER_TEMPLATE_IDS.bigmodel;
 }
 
 export function resolveLoginApiKeyProviderLabel(choice: ApiKeyProviderChoice): string {
+  if (choice === "mgoole") return "芒果AI";
   // Welcome Screen API Key 错误提示需要使用 BigModel 品牌固定写法。
   return choice === "zai" ? "Z.ai" : "BigModel";
 }
@@ -29,7 +29,7 @@ export function resolveLoginApiKeyProviderLabel(choice: ApiKeyProviderChoice): s
 function resolveLoginApiKeyProviderFamilyDomain(
   choice: ApiKeyProviderChoice,
 ): ProviderFamilyDomain {
-  return choice;
+  return choice === "zai" ? "zai" : "bigmodel";
 }
 
 export function buildLoginApiKeySkipSettings(

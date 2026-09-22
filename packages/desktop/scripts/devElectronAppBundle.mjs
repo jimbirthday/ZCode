@@ -2,7 +2,7 @@ import { access, cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promis
 import { dirname, join } from "node:path";
 
 export const DEV_ELECTRON_PROTOCOL_SCHEME = "zcode";
-export const DEV_ELECTRON_APP_NAME = "ZCode Dev";
+export const DEV_ELECTRON_APP_NAME = "mgcode Dev";
 export const DEV_ELECTRON_APP_BUNDLE_ID = "dev.zcode.app.development";
 // 副本布局版本，见 prepareDevElectronAppBundle 中的指纹说明。
 export const DEV_ELECTRON_BUNDLE_FORMAT = 2;
@@ -111,6 +111,13 @@ export async function prepareDevElectronAppBundle({
     // 指纹最后写：中途失败时下次仍会判定为需要重拷，不会留下半成品缓存。
     if (sourceStamp !== undefined) await writeFile(sourceStampPath, sourceStamp, "utf8");
   }
+
+  // 缓存副本只按 Electron 二进制失效，图标更新不会触发重拷；每次启动单独同步产品图标。
+  // 仅修改本工具生成的 .app，保留 node_modules 中的原始 Electron 资源。
+  await cp(
+    new URL("../build/icon.icns", import.meta.url),
+    join(appPath, "Contents", "Resources", "electron.icns"),
+  );
 
   return {
     appPath,

@@ -2,6 +2,7 @@ import { grantPermissionFullAccess } from "../permission-full-access.js";
 import {
   getSessionShellSelection,
   initializeSessionShellEnvironmentIfNeeded,
+  setPromptProfiles,
   updateConfig,
   setExecutionState,
 } from "./config.js";
@@ -198,6 +199,7 @@ type AgentRuntimeConstructor = { prototype: object };
 
 export function installAgentRuntimeMethods(ctor: AgentRuntimeConstructor): void {
   const proto = ctor.prototype as Record<string, unknown>;
+  proto.setPromptProfiles = setPromptProfiles;
   proto.updateConfig = updateConfig;
   proto.setExecutionState = setExecutionState;
   proto.grantPermissionFullAccess = grantPermissionFullAccess;

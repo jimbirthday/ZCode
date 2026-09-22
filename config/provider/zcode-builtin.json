@@ -5,6 +5,28 @@
     "providerConfigRules": {
       "templateRules": [
         {
+          "templateId": "mgoole",
+          "templateNameMap": {
+            "zh-CN": "芒果AI",
+            "en-US": "Mango AI"
+          },
+          "config": {
+            "access": {
+              "type": "api-key",
+              "apiKeyManagementUrl": "https://mgoole.com"
+            },
+            "api": {
+              "type": "openai-chat-completions",
+              "baseUrl": "https://mgoole.com/v1"
+            },
+            "builtinModelIds": ["grok-4.7"],
+            "logo": {
+              "type": "builtin",
+              "key": "xai"
+            }
+          }
+        },
+        {
           "templateId": "zai-api",
           "templateNameMap": {
             "zh-CN": "Z.ai Coding Plan",
@@ -892,6 +914,27 @@
               "reasoningLevel": {
                 "values": ["disabled", "enabled"],
                 "map": "{}"
+              }
+            }
+          }
+        },
+        {
+          "modelMatch": "grok-4\\.7",
+          "config": {
+            "properties": {
+              "contextWindow": 256000,
+              "inputFormat": {
+                "supportsText": true,
+                "supportsImage": true,
+                "supportsVideo": false,
+                "supportsPdf": false,
+                "supportsAudio": false
+              },
+              "supportsJsonSchemaOutput": true
+            },
+            "optionSpecs": {
+              "maxOutputTokens": {
+                "max": 32000
               }
             }
           }

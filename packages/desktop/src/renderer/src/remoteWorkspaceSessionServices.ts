@@ -48,5 +48,7 @@ export function buildRemoteWorkspaceSessionServices(
     // 无法读取远端待审 Hook。
     // hooks 读写（loadHooks/saveHooks）与 grantWorkspaceHookTrust 授权都必须打到远端 host。
     hooksService: remoteServices.hooksService,
+    // 模型提示词写在 Agent 所在机器的 ~/.zcode/cli/config.json，远端工作区必须走远端服务。
+    promptProfileService: remoteServices.promptProfileService,
   };
 }

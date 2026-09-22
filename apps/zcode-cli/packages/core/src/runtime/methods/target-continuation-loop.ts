@@ -3,6 +3,8 @@ import type { ContinueActiveTargetLoopOptions, TurnResult } from "../types.js";
 import { createRuntimeCommandId } from "../command-queue.js";
 import type { TargetContinuationLoopRuntimeCommand } from "../command-queue.js";
 import { executeTargetContinuationCommand } from "./target.js";
+import { createMessageId, createTurnId } from "../deps.js";
+import { settleGoalContinuation, takeVisibleGoalStop, visibleGoalStopTurnResult } from "../goal-stop.js";
 import { enqueueCancellableRuntimeCommand } from "./runtime-command-submit.js";
 
 interface RunActiveTargetContinuationLoopOptions extends ContinueActiveTargetLoopOptions {
@@ -65,13 +67,77 @@ export async function runActiveTargetContinuationLoop(
       return lastResult;
     }
 
-    const result = await executeTargetContinuationCommand.call(this, {
-      ...(options.abortSignal ? { abortSignal: options.abortSignal } : {}),
-      ...(options.inputId !== undefined ? { inputId: options.inputId } : {}),
-      ...(continuationIntent ? { intent: continuationIntent } : {}),
-      traceContext,
-      verifyBeforeContinue,
+    // 第一次校验失败时 lastResult 仍是 null。命令抛错或只记住停止都不能再抛出去，
+    // 否则 task-notification 捕获后返回 null，失败对用户不可见。
+    let result: TurnResult | null = null;
+    let commandError: unknown;
+    try {
+      result = await executeTargetContinuationCommand.call(this, {
+        ...(options.abortSignal ? { abortSignal: options.abortSignal } : {}),
+        ...(options.inputId !== undefined ? { inputId: options.inputId } : {}),
+        ...(continuationIntent ? { intent: continuationIntent } : {}),
+        traceContext,
+        verifyBeforeContinue,
+      });
+    } catch (error) {
+      commandError = error;
+    }
+    const settled = settleGoalContinuation({
+      lastResult,
+      commandResult: result,
+      commandError,
+      goalStop: takeVisibleGoalStop(this),
     });
+    if (settled.kind === "rethrow") throw commandError;
+    if (settled.kind === "stop") {
+      const stop = { kind: "goal-stop" as const, visible: true as const, passed: false as const, message: settled.message };
+      try {
+        return (await visibleGoalStopTurnResult(
+          {
+            getProjection: () => this.getProjection(),
+            persistSyntheticUserNoticeForSession: (input) =>
+              this.persistSyntheticUserNoticeForSession({
+                ...input,
+                messageID: input.messageID as never,
+                sessionId: input.sessionId as never,
+                traceContext: input.traceContext as never,
+              }),
+            sessionId: this.sessionId,
+          },
+          stop,
+          traceContext,
+          {
+            fallbackTurnId: createTurnId(),
+            messageId: createMessageId(),
+          },
+        )) as unknown as TurnResult;
+      } catch {
+        return {
+          events: [],
+          projection: {
+            activeToolCalls: [],
+            backgroundTasks: [],
+            contextUsed: 0,
+            contextWindow: 0,
+            createdAt: new Date(0),
+            id: this.sessionId,
+            mode: this.config.mode ?? "build",
+            pendingPermissions: [],
+            pendingSteerInputs: [],
+            status: "idle",
+            streamingToolLedger: [],
+            targetCompletionVerificationTimeline: [],
+            targetCompletionVerifications: [],
+            totalTokenCount: 0,
+            turnCount: 0,
+            updatedAt: new Date(0),
+          },
+          response: settled.message,
+          traceId: traceContext.traceId,
+          turnId: createTurnId(),
+        };
+      }
+    }
     if (!result) return lastResult;
 
     lastResult = result;

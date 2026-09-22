@@ -53,6 +53,11 @@ interface CreateHostCommandEnvelopeInput<T extends CommandType> {
   baseLogEpoch?: string;
 }
 
+/** New session writes are Protocol v4 commands. Legacy session/create is not this path. */
+export function selectNewSessionWriteProtocol(): "v4" {
+  return "v4";
+}
+
 /** 构造 host 侧命令信封；CAS 命令缺 baseRevision 就地抛出。 */
 export function createHostCommandEnvelope<T extends CommandType>(
   input: CreateHostCommandEnvelopeInput<T>,

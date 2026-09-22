@@ -214,6 +214,9 @@ export interface AgentRuntimeConfig {
 
   // Context Builder config
   systemPrompt?: string;
+  promptProfiles?: readonly import("../context/prompt-profile.js").ModelPromptProfile[];
+  /** Browser control stays off the model tool list unless this permission gate is set. */
+  browserPermissionGated?: boolean;
   /**
    * 动态工作流子代理的身份输入：在场即让
    * context builder 走「基座 + 工作流子代理契约 + persona 叠加」路径，而不是把 persona 当

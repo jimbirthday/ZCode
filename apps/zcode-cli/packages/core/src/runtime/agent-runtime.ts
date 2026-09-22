@@ -338,6 +338,7 @@ export interface AgentRuntime {
   lastPermissionGrantId?: string;
   beginShutdown(): void;
   closeBrowserSession(): Promise<void>;
+  setPromptProfiles(profiles: NonNullable<AgentRuntimeConfig["promptProfiles"]>): void;
   updateConfig(
     patch: Pick<AgentRuntimeConfig, "mode" | "planEnabled" | "language" | "outputStyle">,
   ): void;

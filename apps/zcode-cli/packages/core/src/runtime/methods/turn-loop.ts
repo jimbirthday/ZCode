@@ -2,6 +2,8 @@ import { beginLocalTurnPreparation } from "@zcode/contracts";
 import {
   CompactPhase,
   CompactReason,
+  CoreErrorType,
+  createCoreError,
   createMessageId,
   traceContextToLogContext,
   TurnMachineImpl,
@@ -22,6 +24,7 @@ import {
 } from "../../agent/message-history.js";
 import type { AgentRuntimeInternal } from "../internal.js";
 import { runModelBackedTurnStep } from "./turn-model-step.js";
+import { decideSubagentBudgetStop } from "../subagent-budget.js";
 import {
   AUTOMATION_MUTATION_TOOL_NAMES,
   evaluateRapidRefill,
@@ -46,6 +49,17 @@ export async function runRegularTurnLoop(
 ): Promise<void> {
   while (true) {
     throwIfTurnAborted(state.turnAbortSignal);
+    const budgetStop = decideSubagentBudgetStop({
+      taskType: this.config.taskType,
+      modelStepCount: state.modelStepCount,
+      maxTurns: this.config.maxTurns,
+    });
+    if (budgetStop.stop) {
+      throw createCoreError(CoreErrorType.ToolExecutionFailed, budgetStop.message ?? "budget exhausted", {
+        context: { reason: "subagent_budget_exhausted" },
+        recoverable: false,
+      });
+    }
     const outputTokenRecoveryActive = state.turnRequestState.outputTokenContinuationCount > 0;
     // guide 只允许由完整 tool result batch 设置这个一次性诊断；普通 queue 不在
     // model roundtrip 起点消费，避免把未来 turn 错并入当前 product turn。

@@ -2,15 +2,12 @@ import { useState } from "react";
 import { isApiKeyAccess } from "@zcode/provider";
 import { Loader2Icon, TriangleAlertIcon } from "lucide-react";
 import {
-  BIGMODEL_PROVIDER_ID,
-  TID_LOGIN_API_KEY_CANCEL_BUTTON,
   TID_LOGIN_API_KEY_CONTINUE_BUTTON,
   TID_LOGIN_API_KEY_ERROR,
   TID_LOGIN_API_KEY_INPUT,
   TID_LOGIN_API_KEY_PROVIDER_ITEM,
   TID_LOGIN_API_KEY_PROVIDER_TRIGGER,
   TID_LOGIN_API_KEY_SKIP_BUTTON,
-  ZAI_PROVIDER_ID,
   testId,
 } from "@zcode/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert.js";
@@ -28,7 +25,6 @@ import { useProviderSettingsView } from "@/hooks/useProviderSettingsView.js";
 import { useServices } from "@/hooks/useServices.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { logger } from "@/logger.js";
-import { renderOAuthProviderIcon } from "@/lib/oauthProviderIcon.js";
 import {
   buildLoginApiKeyDefaultModelPreferenceFromSelection,
   buildLoginApiKeySkipSettings,
@@ -128,7 +124,9 @@ export function LoginApiKeyForm({ onCancel, onSaved, onSkipped }: LoginApiKeyFor
     try {
       // 跳过只表示用户确认当前 provider family 运行域，不能写入空 API Key
       // 或触发 API Key 登录成功事件，否则后续模型选择会误以为已有可用凭据。
-      await settingService.update(buildLoginApiKeySkipSettings(providerChoice, Date.now()));
+      if (providerChoice !== "mgoole") {
+        await settingService.update(buildLoginApiKeySkipSettings(providerChoice, Date.now()));
+      }
       await onSkipped();
     } catch (skipError) {
       logger.error("[LoginEntry] 跳过 API Key 登录失败", {
@@ -159,8 +157,8 @@ export function LoginApiKeyForm({ onCancel, onSaved, onSkipped }: LoginApiKeyFor
         <div className="space-y-2">
           <div>
             <Select
-              value={providerChoice}
-              onValueChange={(value) => setProviderChoice(value as ApiKeyProviderChoice)}
+              value="mgoole"
+              onValueChange={() => setProviderChoice("mgoole")}
               disabled={busy}
             >
               <SelectTrigger
@@ -176,23 +174,13 @@ export function LoginApiKeyForm({ onCancel, onSaved, onSkipped }: LoginApiKeyFor
               </SelectTrigger>
               <SelectContent align="end" className="rounded-lg">
                 <SelectItem
-                  value="zai"
+                  value="mgoole"
                   className="rounded-md"
-                  data-testid={testId(TID_LOGIN_API_KEY_PROVIDER_ITEM, "zai")}
+                  data-testid={testId(TID_LOGIN_API_KEY_PROVIDER_ITEM, "mgoole")}
                 >
-                  {renderOAuthProviderIcon(ZAI_PROVIDER_ID, "size-4")}
-                  {intl.formatMessage({ id: "login.apiKey.provider.zai" })}
+                  {intl.formatMessage({ id: "login.apiKey.provider.mgoole" })}
                 </SelectItem>
-                <SelectItem
-                  value="bigmodel"
-                  className="rounded-md"
-                  data-testid={testId(TID_LOGIN_API_KEY_PROVIDER_ITEM, "bigmodel")}
-                >
-                  {renderOAuthProviderIcon(BIGMODEL_PROVIDER_ID, "size-4")}
-                  {intl.formatMessage({
-                    id: "login.apiKey.provider.bigmodel",
-                  })}
-                </SelectItem>
+
               </SelectContent>
             </Select>
           </div>
@@ -258,17 +246,7 @@ export function LoginApiKeyForm({ onCancel, onSaved, onSkipped }: LoginApiKeyFor
           {saving ? <Loader2Icon className="size-4 animate-spin" /> : null}
           {intl.formatMessage({ id: "login.apiKey.continue" })}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 w-full text-ui-base"
-          size="lg"
-          data-testid={TID_LOGIN_API_KEY_CANCEL_BUTTON}
-          disabled={busy}
-          onClick={onCancel}
-        >
-          {intl.formatMessage({ id: "login.apiKey.cancel" })}
-        </Button>
+
         <Button
           type="button"
           variant="link"

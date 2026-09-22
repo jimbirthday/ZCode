@@ -69,7 +69,7 @@ const platform = normalizePlatform(process.env.ZCODE_TARGET_OS || "") || process
 const arch = normalizeArch(process.env.ZCODE_TARGET_ARCH || "") || process.arch;
 const platformKey = `${platform}-${arch}`;
 
-const glmDir = resolve(desktopRoot, "bundled-agents", platformKey, "glm");
+const glmDir = resolve(desktopRoot, "bundled-agents", platformKey, "agent");
 // zcode.cjs / .node-bundle-meta.json 的落点由 stage-agent-bundle.mjs 自己解析（同源）。
 // node_repl 宿主抽成独立包
 // @zcode/node-repl-host 之后，browser-use 不再产出 dist/mcp/server.js，CUA 资产

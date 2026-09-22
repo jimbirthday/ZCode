@@ -9,6 +9,8 @@ import {
 import { persistSubagentMessageCommand } from "./subagent-messages.js";
 import { runControlOnlyTurnCommand } from "./control-only-turn.js";
 import { createTurnCancelledError } from "../helpers/index.js";
+import { createTurnId } from "../deps.js";
+import { settleGoalContinuation, takeVisibleGoalStop } from "../goal-stop.js";
 import { executeTargetContinuationCommand } from "./target.js";
 import { runActiveTargetContinuationLoop } from "./target-continuation-loop.js";
 import { isStaleBranchRuntimeCommand } from "./runtime-command-generation.js";
@@ -166,19 +168,54 @@ async function runPostCommandActiveTargetLoop(
   }
   if (command.mode === "task-notification") {
     try {
-      return await runActiveTargetContinuationLoop.call(this, {
+      const continued = await runActiveTargetContinuationLoop.call(this, {
         abortSignal,
         traceContext: command.traceContext,
         trigger: "task-notification",
         verifyBeforeFirstContinue: true,
       });
+      return continued;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger?.warn("Post-command goal continuation failed", {
         ...traceContextToLogContext(command.traceContext),
-        errorMessage: error instanceof Error ? error.message : String(error),
+        errorMessage,
         event: "target.continuation.after_command_failed",
         module: "core.runtime",
       });
+      // 第一次校验失败不能在这里变成 null。停止结果必须带回调用方。
+      const settled = settleGoalContinuation({
+        lastResult: null,
+        commandResult: null,
+        commandError: error,
+        goalStop: takeVisibleGoalStop(this),
+      });
+      if (settled.kind === "stop") {
+        return {
+          events: [],
+          projection: {
+            activeToolCalls: [],
+            backgroundTasks: [],
+            contextUsed: 0,
+            contextWindow: 0,
+            createdAt: new Date(0),
+            id: this.sessionId,
+            mode: this.config.mode ?? "build",
+            pendingPermissions: [],
+            pendingSteerInputs: [],
+            status: "idle",
+            streamingToolLedger: [],
+            targetCompletionVerificationTimeline: [],
+            targetCompletionVerifications: [],
+            totalTokenCount: 0,
+            turnCount: 0,
+            updatedAt: new Date(0),
+          },
+          response: settled.message,
+          traceId: command.traceContext.traceId,
+          turnId: command.traceContext.turnId ?? createTurnId(),
+        };
+      }
     }
   }
   return null;

@@ -2,6 +2,8 @@
 // Bash Tool Handler
 // ============================================================
 
+import { homedir } from "node:os";
+import { decideBashSandbox } from "../bash-sandbox-policy.js";
 import {
   BashInputJsonSchema,
   BashInputSchema,
@@ -129,6 +131,17 @@ async function executeBashHandler(
     return emptyBashOutput(parsed);
   }
 
+  // 凭证目录在 spawn 前拒绝。权限模式（含 yolo）不参与放行。
+  const sandbox = decideBashSandbox({
+    command: parsed.command,
+    homeDir: homedir(),
+  });
+  if (!sandbox.allowed) {
+    throw createCoreError(CoreErrorType.ToolExecutionFailed, sandbox.reason ?? "sandbox denied", {
+      context: { toolCallId: context.toolCallId, toolName: "Bash", code: "bash_sandbox_violation" },
+      recoverable: true,
+    });
+  }
   const request = createExecutionRequest(parsed, context, timeoutPolicy);
   const progressTiming: BashProgressTiming = {};
   const commandTelemetry = startBashCommandTelemetry(parsed, context);

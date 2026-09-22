@@ -31,6 +31,7 @@ import {
   ISubagentsService,
   ICommandsService,
   IHooksService,
+  IPromptProfileService,
   IMemoryService,
   ISettingsSyncService,
   IPromptAttachmentTransferService,
@@ -358,6 +359,7 @@ export function createRemoteWorkspaceServiceCollection(params: {
     .register(ICommandsService, params.connectionServices.commandsService)
     .register(ISubagentsService, createSubagentsService({ isDesktopRuntime: true }))
     .register(IHooksService, params.connectionServices.hooksService)
+    .register(IPromptProfileService, params.connectionServices.promptProfileService)
     .register(IMemoryService, createMemoryService())
     .register(
       ISettingsSyncService,

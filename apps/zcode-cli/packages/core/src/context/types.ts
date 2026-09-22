@@ -13,6 +13,7 @@ import type {
 } from "@zcode/contracts";
 import type { AutoCompactPolicyConfig } from "../compact/index.js";
 import type { AgentProfile } from "../subagent/profile.js";
+import type { ModelPromptProfile, ModelPromptQuery } from "./prompt-profile.js";
 
 export type {
   EnvInfo,
@@ -115,6 +116,12 @@ export interface ContextBuilderConfig {
   embeddedSearchEnabled?: boolean;
   skillMetadataBudget?: number;
   customSystemPrompt?: string;
+  promptProfiles?: readonly ModelPromptProfile[];
+  modelQuery?: ModelPromptQuery;
+  /** Skill listings stay out of the request unless a caller opts in. */
+  injectSkillListing?: boolean;
+  /** Memory indexes stay out of the request unless a caller opts in. */
+  injectMemoryIndex?: boolean;
   /**
    * 动态工作流子代理（workflow child）的身份输入。在场即走 builder 的第三条路径：
    * 基座段（CLI prefix、安全行、Harness、memory）+ 工作流子代理契约 + persona 叠加，

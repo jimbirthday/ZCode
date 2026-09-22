@@ -23,6 +23,7 @@ import {
   type ClientFacingPorts,
 } from "../helpers/child-client-ports.js";
 import type { AgentRuntimeConfig, ActiveTurnInfo } from "../types.js";
+import { editToolForModel, filterDefaultModelTools } from "../../tool/edit-dialect.js";
 import type { AgentRuntimeInternal } from "../internal.js";
 import { cloneModelSelection } from "../model-selection.js";
 import { applyRuntimeExecutionState } from "../execution-state.js";
@@ -43,6 +44,14 @@ export async function setExecutionState(
   traceContext?: TraceContext,
 ): Promise<void> {
   await applyRuntimeExecutionState(this, input, { source: "command", traceContext });
+}
+
+export function setPromptProfiles(
+  this: AgentRuntimeInternal,
+  profiles: NonNullable<AgentRuntimeConfig["promptProfiles"]>,
+): void {
+  // 下一次组 prompt 读这个字段。不改已发出的历史，也不打断当前轮。
+  this.config.promptProfiles = profiles.map((profile) => ({ ...profile }));
 }
 
 export function updateConfig(
@@ -137,13 +146,18 @@ export function getTools(this: AgentRuntimeInternal, model?: Model): ModelToolCo
   if (this.cachedTools === null) {
     this.cachedTools = filterRuntimeVisibleTools.call(this, this.registry.toContracts());
   }
-  return this.cachedTools
-    .filter((tool) => tool.name !== "WebSearch" || shouldExposeWebSearch.call(this, model))
-    .map((tool) =>
-      projectToolModelContract(tool, this.registry.get(tool.name), {
-        model,
-      }),
-    );
+  const editTool = editToolForModel(model?.providerId ?? "", model?.modelId ?? "");
+  return filterDefaultModelTools(
+    this.cachedTools.filter((tool) => tool.name !== "WebSearch" || shouldExposeWebSearch.call(this, model)),
+    {
+      browserPermissionGated: this.config.browserPermissionGated === true,
+      editTool,
+    },
+  ).map((tool) =>
+    projectToolModelContract(tool, this.registry.get(tool.name), {
+      model,
+    }),
+  );
 }
 
 export function invalidateToolCache(this: AgentRuntimeInternal): void {

@@ -73,15 +73,18 @@ function registerE2EStoreBridgesIfEnabled() {
   });
 }
 
-// 初始化主题：默认 Zai dark，后续由 useTheme hook 接管
+// 初始化主题：默认芒果AI，后续由 useTheme hook 接管
 {
-  const saved = localStorage.getItem("zcode-theme") || "zai-dark";
+  const savedRaw = localStorage.getItem("zcode-theme") || "mango";
+  // 首屏必须尊重保存的偏好，不能把用户选择的深色强制迁移为芒果。
+  const saved = savedRaw;
+  const mango = saved === "mango";
   const resolved =
     saved === "system"
       ? window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light"
-      : saved === "dark" || saved === "zai-dark"
+      : saved === "dark" || saved === "zai-dark" || mango
         ? "dark"
         : "light";
   const appliedTheme =
@@ -96,7 +99,8 @@ function registerE2EStoreBridgesIfEnabled() {
           : saved;
   if (resolved === "dark") document.documentElement.classList.add("dark");
   document.documentElement.classList.toggle("theme-zai-light", appliedTheme === "zai-light");
-  document.documentElement.classList.toggle("theme-zai-dark", appliedTheme === "zai-dark");
+  document.documentElement.classList.toggle("theme-zai-dark", appliedTheme === "zai-dark" || mango);
+  document.documentElement.classList.toggle("theme-mango", mango);
 }
 
 const isMacDesktop = navigator.userAgent.includes("Mac");

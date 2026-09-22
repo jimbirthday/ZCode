@@ -1,6 +1,7 @@
 import type { ConfigResult } from "@zcode/adapters/config";
 import { resolveInitialModelSelection, type ModelSelectionOptions } from "@zcode/provider";
 import { resolveBashTimeoutPolicy, type AgentProfile, type AgentRuntimeConfig } from "@zcode/core";
+import { promptProfilesFromLoadedConfig } from "./prompt-profile-config.js";
 import { type BuiltInSubagentModelSelectionOverrides } from "@zcode/shared";
 import {
   type CollaborationMode,
@@ -117,6 +118,11 @@ export function resolveAppRuntimeConfig(input: {
     options.runtimeConfig?.subagents?.builtInModelSelectionOverrides ?? {};
   const runtimeConfig: AgentRuntimeConfig = {
     ...options.runtimeConfig,
+    // 用户配置里的 promptProfiles 必须进运行时，系统/子代理/工作流都读这份目录。
+    promptProfiles: promptProfilesFromLoadedConfig({
+      override: options.runtimeConfig?.promptProfiles,
+      loaded: configResult.config.promptProfiles,
+    }),
     bashTimeoutPolicy:
       options.runtimeConfig?.bashTimeoutPolicy ??
       resolveBashTimeoutPolicy(options.env ?? process.env),
@@ -184,6 +190,11 @@ export function resolveAppRuntimeConfig(input: {
       workspaceIdentity: workspaceIdentity?.trim() || undefined,
     },
   };
+  // 再赋一次，避免前面的展开把目录盖掉。Builder 读的就是这个字段。
+  runtimeConfig.promptProfiles = promptProfilesFromLoadedConfig({
+    override: options.runtimeConfig?.promptProfiles,
+    loaded: configResult.config.promptProfiles,
+  });
   return {
     configuredMcpServers,
     runtimeConfig,

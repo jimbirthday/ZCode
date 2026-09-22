@@ -1,9 +1,13 @@
 import type { ZCodeEnv } from "./env.js";
 
-export const DEFAULT_ZCODE_ENDPOINT_ORIGIN = "https://zcode.z.ai";
-export const DEFAULT_BIGMODEL_API_ORIGIN = "https://bigmodel.cn";
-export const DEFAULT_ZAI_OAUTH_ORIGIN = "https://chat.z.ai";
-export const DEFAULT_ZAI_BUSINESS_BASE_URL = "https://api.z.ai";
+// Keep in sync with DISABLED_PRODUCT_ORIGIN. This file is imported by the renderer,
+// so it must not pull in node:path via product-runtime-identity.
+const DISABLED_PRODUCT_ORIGIN = "http://127.0.0.1:9";
+
+export const DEFAULT_ZCODE_ENDPOINT_ORIGIN = DISABLED_PRODUCT_ORIGIN;
+export const DEFAULT_BIGMODEL_API_ORIGIN = DISABLED_PRODUCT_ORIGIN;
+export const DEFAULT_ZAI_OAUTH_ORIGIN = DISABLED_PRODUCT_ORIGIN;
+export const DEFAULT_ZAI_BUSINESS_BASE_URL = DISABLED_PRODUCT_ORIGIN;
 export const DEFAULT_ZAI_OAUTH_CLIENT_ID = "client_P8X5CMWmlaRO9gyO-KSqtg";
 
 // 构建仅注入公开链接；Node 调用方仍可显式传 env，避免读取另一进程的配置。

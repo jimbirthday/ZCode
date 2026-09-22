@@ -1,4 +1,4 @@
-import type { BackgroundBashOutputResult, SessionDebugSnapshot } from "@zcode/shared";
+import type { BackgroundBashOutputResult, PromptProfile, SessionDebugSnapshot } from "@zcode/shared";
 /* eslint-disable max-lines -- ZCode agent service 接口集中声明 protocol/session/workspace 方法，拆分会增加 service descriptor 迁移成本。 */
 import type { Event, IDisposable } from "@zcode/rpc";
 import { ServiceChannels } from "@zcode/shared";
@@ -601,6 +601,11 @@ export interface IZCodeAgentService {
   grantWorkspaceHookTrust(
     params: ZCodeAgentGrantWorkspaceHookTrustParams,
   ): Promise<ZCodeWorkspaceHookTrustGrantResult>;
+  /** 把已写入用户配置的提示词目录推到本环境正在运行的 Agent。没有运行中的进程时不拉起新进程。 */
+  applyPromptProfiles(profiles: readonly PromptProfile[]): Promise<{
+    appliedToRunningAgents: boolean;
+    runningAgentCount: number;
+  }>;
   listMcpServerStatuses(params: ZCodeAgentListMcpServerStatusesParams): Promise<ZCodeMcpListResult>;
   listPlugins(params: ZCodeAgentPluginViewParams): Promise<ZCodePluginsListResult>;
   /**

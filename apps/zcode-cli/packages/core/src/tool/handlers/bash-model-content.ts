@@ -4,10 +4,9 @@ import {
   type BashOutput,
   type ModelMessageContent,
 } from "@zcode/contracts";
-import { formatPersistedOutputEnvelope } from "../result-persistence-format.js";
+import { summarizeLargeToolResult } from "../large-tool-output.js";
 import { isBashProviderErrorStatus } from "./bash-semantics.js";
 
-const MODEL_RESULT_PREVIEW_CHARS = 2_000;
 const ASSISTANT_BLOCKING_BUDGET_MS = 15_000;
 const READ_TOOL_NAME = "Read";
 
@@ -72,17 +71,25 @@ function formatTextContentForModel(result: BashOutput): string {
     .join("\n");
 }
 
+const LARGE_MODEL_OUTPUT_CHARS = 2_000;
+
 function formatStdoutContentForModel(result: BashOutput): string {
   let processedStdout = formatStdoutForModel(result.stdout);
   const persistedOutputPath =
     result.status === "backgrounded"
       ? undefined
       : (result.persistedOutputPath ?? result.rawOutputPath);
-  if (persistedOutputPath) {
+  const originalBytes = observedOutputBytes(result);
+  // 已落盘或超过预览预算的输出不能再把 2000 字正文留在模型上下文，只保留摘要和路径。
+  if (
+    persistedOutputPath ||
+    processedStdout.length > LARGE_MODEL_OUTPUT_CHARS ||
+    originalBytes > LARGE_MODEL_OUTPUT_CHARS
+  ) {
     processedStdout = formatBashPersistedOutputContent({
       content: processedStdout,
-      originalBytes: observedOutputBytes(result),
-      persistedPath: persistedOutputPath,
+      originalBytes,
+      persistedPath: persistedOutputPath ?? "(output not persisted)",
     });
   }
   return processedStdout;
@@ -104,6 +111,13 @@ function formatStdoutForModel(stdout: string): string {
 
 function formatStderrForModel(result: BashOutput): string {
   let message = result.stderr.trim();
+  if (message.length > LARGE_MODEL_OUTPUT_CHARS) {
+    message = formatBashPersistedOutputContent({
+      content: message,
+      originalBytes: Buffer.byteLength(message, "utf8"),
+      persistedPath: result.stderrPersistedOutputPath ?? result.persistedOutputPath ?? "(output not persisted)",
+    });
+  }
   if (result.interrupted) {
     if (message) message += "\n";
     message += "<error>Command was aborted before completion</error>";
@@ -160,32 +174,16 @@ function observedOutputBytes(result: BashOutput): number {
   );
 }
 
-function formatBashPersistedOutputContent(input: {
+export function formatBashPersistedOutputContent(input: {
   content: string;
   originalBytes: number;
   persistedPath: string;
 }): string {
-  return formatPersistedOutputEnvelope({
+  return summarizeLargeToolResult({
     content: input.content,
-    formatBytes: formatBashOutputByteSize,
     originalBytes: input.originalBytes,
-    persistedPath: input.persistedPath,
-    previewChars: MODEL_RESULT_PREVIEW_CHARS,
+    path: input.persistedPath,
   });
-}
-
-function formatBashOutputByteSize(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "0 bytes";
-  const kb = bytes / 1024;
-  if (kb < 1) return `${bytes} bytes`;
-  if (kb < 1024) return `${trimUnit(kb)}KB`;
-  const mb = kb / 1024;
-  if (mb < 1024) return `${trimUnit(mb)}MB`;
-  return `${trimUnit(mb / 1024)}GB`;
-}
-
-function trimUnit(value: number): string {
-  return value.toFixed(1).replace(/\.0$/, "");
 }
 
 function maybeImageContent(result: BashOutput): ModelMessageContent | undefined {

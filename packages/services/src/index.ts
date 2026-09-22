@@ -198,6 +198,8 @@ export type {
 
 // Hooks service — IHooksService is both a type (interface) and value (descriptor).
 export { IHooksService } from "./hooks/hooks.js";
+export { IPromptProfileService } from "./prompt-profiles/promptProfiles.js";
+export type { PromptProfileSaveResult } from "./prompt-profiles/promptProfiles.js";
 
 // Memory service — IMemoryService is both a type (interface) and value (descriptor).
 export {

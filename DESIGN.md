@@ -1,4 +1,4 @@
-# ZCode Design System
+# mgcode Design System
 
 Portable design system for AI-assisted UI work in this repository.
 
@@ -19,7 +19,7 @@ Treat violations of this section as design-system defects, not stylistic prefere
 
 ## Product Character
 
-ZCode is a desktop-first and web-compatible AI workspace. The interface should feel calm, dense, and operational rather than decorative.
+mgcode is a desktop-first and web-compatible AI workspace. The interface should feel calm, dense, and operational rather than decorative.
 
 Design for:
 
@@ -43,9 +43,12 @@ Avoid:
 
 User-facing theme choices are:
 
+- Mango AI (default): layered midnight-navy reading surfaces, cream text, mango actions and sky-blue focus
 - System
 - Light Theme, backed by Zai Light
 - Dark Theme, backed by Zai Dark
+
+Mango artwork is limited to quiet edge decoration; opaque cards, inputs, menus and popovers protect text contrast. Primary, secondary and tertiary reading text must reach 4.5:1 against their surfaces. See `specs/mgcode-appearance/SPEC.md`.
 
 Default light and dark CSS variables still exist as fallback foundations, but new UI should be validated against Zai Light and Zai Dark as the active light/dark experiences.
 

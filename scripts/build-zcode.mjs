@@ -10,6 +10,7 @@ import {
   patchNodePtyPrebuilds,
   stageTuiRuntime,
 } from "./zcode-distribution/assets.mjs";
+import { installBundledNodeRuntime } from "./zcode-distribution/bundled-node.mjs";
 import { installScriptSource } from "./zcode-distribution/installer.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -191,6 +192,8 @@ async function stageZCodePackage({ packageRoot, version }) {
     resolve(packageRoot, "agent/THIRD-PARTY-NOTICES.md"),
   );
   await chmod(resolve(packageRoot, "agent", "zcode.cjs"), 0o755);
+  // 启动器 exec $ROOT/runtime/node，不走 PATH。这里必须把构建用的 Node 装进包，否则命令以 127 退出。
+  await installBundledNodeRuntime(packageRoot);
 
   await stageTuiRuntime(packageRoot);
   await copyRuntimeNodeModules(packageRoot);

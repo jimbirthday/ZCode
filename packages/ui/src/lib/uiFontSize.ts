@@ -18,8 +18,13 @@ export function loadUiFontSizePx(): number {
 }
 
 export function applyUiFontSizePx(fontSizePx: number): void {
-  const rootStyle = typeof document === "undefined" ? undefined : document.documentElement?.style;
+  const root = typeof document === "undefined" ? undefined : document.documentElement;
+  const rootStyle = root?.style;
   if (!rootStyle?.setProperty) {
+    return;
+  }
+  // 自定义主题的字号是主题文档的一部分。字号偏好不能盖掉已经画上的主题 token。
+  if (root?.getAttribute?.("data-theme-applied") === "custom") {
     return;
   }
   // 只更新 UI 字号 Token 的基准变量，避免根 font-size 连带缩放图标、间距和圆角。

@@ -134,6 +134,8 @@ export const ServiceChannels = {
   Commands: "commands",
   /** Hooks 管理服务 */
   Hooks: "hooks",
+  /** 按模型编辑的系统提示词目录 */
+  PromptProfiles: "prompt-profiles",
   /** Memory 管理服务 */
   Memory: "memory",
   /** 首次启动设置同步服务 */

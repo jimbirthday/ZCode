@@ -30,7 +30,7 @@ const CUA_DRAG_ICON_SIZE = 64;
  *
  * 不能用 `nativeImage.createFromNamedImage("NSApplicationIcon")`：那取的是**当前宿主 app** 的
  * 图标，dev 下宿主是 Electron.app，于是拖拽时显示 Electron 默认图标。
- * 改为显式读随包的 ZCode 图标（electron-builder 已把 build/icon.png 打进 resources/icon.png）。
+ * 改为显式读随包的 mgcode 图标（electron-builder 已把 build/icon.png 打进 resources/icon.png）。
  */
 let cachedZCodeIcon: Electron.NativeImage | null = null;
 

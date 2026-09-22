@@ -97,6 +97,7 @@ import {
   zcodeWorkspaceGenerateTextResultSchema,
   zcodeWorkspaceHookTrustGrantResultSchema,
   zcodeWorkspaceUpdateInteractionPreferencesResultSchema,
+  zcodeWorkspaceUpdatePromptProfilesResultSchema,
   zcodeWorkspaceUpdateModelIoPreferencesResultSchema,
   zcodeProviderUpdateAccountConfigResultSchema,
   type ZCodeSessionStateSnapshot,
@@ -296,6 +297,10 @@ import { AutomationRepo } from "#src/session/automationRepo.js";
 import { TaskIndexRepo } from "#src/session/taskIndexRepo.js";
 import { ZCodeAgentMcpStatusModeUnsupportedError } from "#src/zcode-agent/zcodeAgentErrors.js";
 import { ZCodeAgentProcessManager } from "./zcodeAgentProcessManager.js";
+import {
+  createHostCommandEnvelope,
+  selectNewSessionWriteProtocol,
+} from "./zcodeV4HostCommand.js";
 import type { ZCodeAgentProcessManagerOptions } from "./zcodeAgentProcessManager.js";
 import type { IOffPeakTaskService } from "#src/session/offPeakTask.js";
 import {
@@ -3432,9 +3437,32 @@ export function createZCodeAgentService(
       // 灰度在 client 就绪时已判定，这里是进程内已解析 promise 的再次 await（不打远端）。
       const dynamicWorkflowEnabled = await resolveDynamicWorkflowGate();
       try {
+        if (selectNewSessionWriteProtocol() !== "v4") {
+          throw new Error("new session writes use Protocol v4");
+        }
+        const ack = await this.sendConversationCommandV4({
+          workspacePath: params.workspacePath,
+          ...(params.workspaceIdentity ? { workspaceIdentity: params.workspaceIdentity } : {}),
+          ...(params.remoteSessionId ? { remoteSessionId: params.remoteSessionId } : {}),
+          envelope: createHostCommandEnvelope({
+            type: "createSession",
+            sessionId: null,
+            payload: {
+              workspaceId: params.workspaceIdentity?.trim() || params.workspacePath,
+              ...(params.mcpServers ? { mcpServers: params.mcpServers } : {}),
+              ...(dynamicWorkflowEnabled ? { dynamicWorkflowEnabled } : {}),
+              ...(offPeakToolEnabled ? { offPeakToolEnabled } : {}),
+            },
+          }),
+        });
+        const createdSessionId =
+          ack.result && "sessionId" in ack.result ? ack.result.sessionId : undefined;
+        if (!createdSessionId) {
+          throw new Error(ack.message ?? "v4 createSession did not return a session id");
+        }
         const snapshot = await client.request(
-          zcodeProtocolMethods.sessionCreate,
-          buildSessionCreateParams({ ...params, offPeakToolEnabled, dynamicWorkflowEnabled }),
+          zcodeProtocolMethods.sessionRead,
+          { sessionId: createdSessionId },
           zcodeSessionStateSnapshotSchema,
           sessionTraceId ? { trace: { traceId: sessionTraceId } } : undefined,
         );
@@ -3463,63 +3491,7 @@ export function createZCodeAgentService(
           });
           throw error;
         }
-        logger.warn(sessionTraceId, "ZCode Protocol session/create 命中新旧协议兼容重试", {
-          compatFields,
-          durationMs: Date.now() - startedAt,
-          workspaceKey: resolveWorkspaceKey(params),
-          workspacePath: params.workspacePath,
-        });
-        // host/UI 可能已经发送新版 session/create 可选字段，但本地打包、
-        // 远端部署或仍存活的旧 app-server 还在使用旧 strict schema。只对已知
-        // 可选字段降级重试，避免 thoughtLevel/persistence 版本差阻塞首发创建。
-        const snapshot = await client.request(
-          zcodeProtocolMethods.sessionCreate,
-          buildSessionCreateParams(
-            { ...params, offPeakToolEnabled, dynamicWorkflowEnabled },
-            new Set(compatFields),
-          ),
-          zcodeSessionStateSnapshotSchema,
-          sessionTraceId ? { trace: { traceId: sessionTraceId } } : undefined,
-        );
-        rememberSessionTrace({ ...params, sessionId: snapshot.session.sessionId }, snapshot);
-        if (!compatFields.includes("thoughtLevel") || !params.thoughtLevel) {
-          logger.info(sessionTraceId, "ZCode Protocol session/create 兼容重试完成", {
-            durationMs: Date.now() - startedAt,
-            sessionId: snapshot.session.sessionId,
-            snapshotTraceId: snapshot.session.traceId ?? null,
-            workspaceKey: resolveWorkspaceKey(params),
-            workspacePath: params.workspacePath,
-          });
-          return snapshot;
-        }
-        // 旧 create schema 不认识 thoughtLevel 时，创建后再走旧协议已有的
-        // session/setThoughtLevel，保证首轮 prompt 仍使用用户在工具栏选择的推理强度。
-        const snapshotWithThoughtLevel = await client.request(
-          zcodeProtocolMethods.sessionSetThoughtLevel,
-          {
-            sessionId: snapshot.session.sessionId,
-            thoughtLevel: params.thoughtLevel,
-            persistAsWorkspaceLastUsed: true,
-          },
-          zcodeSessionStateSnapshotSchema,
-          sessionTraceId ? { trace: { traceId: sessionTraceId } } : undefined,
-        );
-        rememberSessionTrace(
-          { ...params, sessionId: snapshotWithThoughtLevel.session.sessionId },
-          snapshotWithThoughtLevel,
-        );
-        logger.info(
-          sessionTraceId,
-          "ZCode Protocol session/create 兼容重试后设置 thoughtLevel 完成",
-          {
-            durationMs: Date.now() - startedAt,
-            sessionId: snapshot.session.sessionId,
-            snapshotTraceId: snapshotWithThoughtLevel.session.traceId ?? null,
-            workspaceKey: resolveWorkspaceKey(params),
-            workspacePath: params.workspacePath,
-          },
-        );
-        return snapshotWithThoughtLevel;
+        throw error;
       }
     },
 
@@ -3789,6 +3761,33 @@ export function createZCodeAgentService(
         });
         throw error;
       }
+    },
+
+    async applyPromptProfiles(profiles) {
+      const clients = [...activeClientsByWorkspaceKey.values()];
+      if (clients.length === 0) {
+        return { appliedToRunningAgents: false, runningAgentCount: 0 };
+      }
+      let runningAgentCount = 0;
+      await Promise.all(
+        clients.map(async (active) => {
+          try {
+            await active.client.request(
+              zcodeProtocolMethods.workspaceUpdatePromptProfiles,
+              {
+                workspace: buildWorkspaceRef(active.workspace),
+                profiles,
+              },
+              zcodeWorkspaceUpdatePromptProfilesResultSchema,
+            );
+            runningAgentCount += 1;
+          } catch (error) {
+            if (isProtocolMethodNotFoundError(error)) return;
+            throw error;
+          }
+        }),
+      );
+      return { appliedToRunningAgents: runningAgentCount > 0, runningAgentCount };
     },
 
     async grantWorkspaceHookTrust(params: ZCodeAgentGrantWorkspaceHookTrustParams) {

@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button.js";
-import { ZCodeAboutLogo } from "@/components/ui/ZCodeAboutLogo.js";
+import mangoGirlUrl from "@/assets/mgcode-splash.png";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { OnboardingWelcomeAsciiVisual } from "@/onboarding/OnboardingWelcomeAsciiVisual.js";
 
@@ -16,13 +16,18 @@ export function OnboardingWelcomeView(props: { onStart: () => void; onOpenMigrat
           </div>
 
           <div className="space-y-2">
-            {/* 欢迎 logo 壳是固定深色底，边框不能跟随浅色主题 token，否则浅色主题下边框过重。*/}
+            {/* 欢迎 logo 使用与 HTML/React 启动阶段相同的芒果娘资源，避免 onboarding 回退到旧 Z 标识。 */}
             <div
-              className="relative flex size-14 items-center justify-center rounded-xl bg-[linear-gradient(180deg,#000000_0%,#151718_100%)] text-[#ffffff] shadow-lg/20 before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border before:border-[rgba(255,255,255,0.1)]"
-              aria-label="ZCode"
+              className="relative flex size-14 items-center justify-center overflow-hidden rounded-xl border border-[#ffc107]/40 bg-[#211f1a] shadow-lg/20"
+              aria-label="mgcode"
               role="img"
             >
-              <ZCodeAboutLogo className="h-auto w-8" />
+              <img
+                src={mangoGirlUrl}
+                alt=""
+                className="size-12 object-contain object-[center_32%]"
+                draggable={false}
+              />
             </div>
             <div className="text-4xl font-bold tracking-tight text-foreground">
               {intl.formatMessage({ id: "onboarding.welcome.title" })}

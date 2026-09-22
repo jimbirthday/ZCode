@@ -22,6 +22,7 @@ import type {
 import { hasRunningBackgroundRuntimeTask } from "../../runtime-task/registry.js";
 import { wrapSystemReminderForSource } from "../../system-reminder/source.js";
 import { verifyActiveTargetCompletionForContinuation } from "./target-completion-verification.js";
+import { buildVisibleGoalStop, rememberVisibleGoalStop } from "../goal-stop.js";
 import { enqueueCancellableRuntimeCommand } from "./runtime-command-submit.js";
 
 export async function recordTargetChanged(
@@ -115,8 +116,10 @@ export async function executeTargetContinuationCommand(
   }
   // 没有 nextAction 的失败结果来自 verifier 自身失败或无效输出，
   // 不是模型确认的下一步工作；继续自动续跑会把内部错误变成无限目标迭代。
-  if (verificationResult && !verificationResult.verification.nextAction?.trim()) {
-    this.logger?.warn("Goal continuation skipped after verifier failed without next action", {
+  if (verificationResult && !verificationResult.verification.passed) {
+    const stop = buildVisibleGoalStop({ reason: verificationResult.verification.reason });
+    rememberVisibleGoalStop(this, stop);
+    this.logger?.warn(stop.message, {
       ...traceContextToLogContext(traceContext),
       event: "target.continuation.skipped_no_next_action",
       module: "core.runtime",
