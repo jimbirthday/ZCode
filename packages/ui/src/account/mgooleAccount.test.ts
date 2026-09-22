@@ -7,6 +7,7 @@ import {
   persistSyncedMgooleCredential,
   projectSharedAccountBilling,
   sessionFromLoginResult,
+  loadPublicLoginSettings,
   startBalanceRecharge,
   startSharedPlanPurchase,
   syncMgooleModelCredential,
@@ -132,6 +133,28 @@ test("wrong credentials and a rejected captcha return no session", async () => {
   });
   assert.equal(captcha.kind, "rejected");
   assert.equal(sessionFromLoginResult(captcha), null);
+});
+
+test("public login settings expose the captcha flags from /settings/public", async () => {
+  const settings = await loadPublicLoginSettings({
+    fetchImpl: async (url) => {
+      assert.equal(url, `${BASE}/settings/public`);
+      return jsonResponse(
+        envelope({
+          turnstile_enabled: true,
+          turnstile_site_key: "site-from-public",
+          tencent_captcha_enabled: true,
+          tencent_captcha_app_id: "tencent-app-from-public",
+          aliyun_captcha_enabled: false,
+        }),
+      );
+    },
+  });
+  assert.equal(settings.turnstileEnabled, true);
+  assert.equal(settings.turnstileSiteKey, "site-from-public");
+  assert.equal(settings.tencentCaptchaEnabled, true);
+  assert.equal(settings.tencentCaptchaAppId, "tencent-app-from-public");
+  assert.equal(settings.aliyunCaptchaEnabled, false);
 });
 
 test("created or changed 芒果AI keys become the model credential without a paste", async () => {

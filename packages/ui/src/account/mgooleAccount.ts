@@ -158,7 +158,7 @@ export function interpretLoginPayload(body: unknown): LoginResult {
   return { kind: "session", session };
 }
 
-async function readJson(response: Response): Promise<unknown> {
+export async function readJson(response: Response): Promise<unknown> {
   const text = await response.text();
   if (!text) return null;
   try {
