@@ -3,9 +3,9 @@ import type { ZCodeTaskMeta } from "@zcode/shared";
 import type { WorkspaceTabState } from "@/store/tabStore.js";
 import { buildTaskEntityKey, buildTaskWorkspaceKey } from "@/lib/taskQueryCache.js";
 import { compareZCodeTaskListItems } from "@/lib/taskListOrdering.js";
-import { mergeTaskWithOptimisticMeta } from "@/lib/zcodeTaskMetaMerge.js";
-import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
-import type { GroupedDraftTaskState } from "@/store/zcodeSessionStoreTypes.js";
+import { mergeTaskWithOptimisticMeta } from "@/lib/mgcodeTaskMetaMerge.js";
+import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/mgcodeSessionStore.js";
+import type { GroupedDraftTaskState } from "@/store/mgcodeSessionStoreTypes.js";
 import { mergeTaskListMembershipFields } from "@/v4/taskListRowActivity.js";
 
 export interface WorkspaceOptimisticTaskOverlay {

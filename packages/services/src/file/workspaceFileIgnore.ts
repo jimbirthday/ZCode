@@ -16,7 +16,7 @@ import type { ServiceLogger } from "../logger/serviceLogger.js";
  * `**` 跨层、目录后缀 `/`、字符类与转义。禁止在本仓库手写 gitignore 解析。
  */
 
-export const WORKSPACE_FILE_SEARCH_IGNORE_FILE_NAME = ".zcodeignore";
+export const WORKSPACE_FILE_SEARCH_IGNORE_FILE_NAME = ".mgcodeignore";
 const GITIGNORE_FILE_NAME = ".gitignore";
 
 type WorkspaceFileIgnoreLogger = Pick<ServiceLogger, "info" | "warn">;

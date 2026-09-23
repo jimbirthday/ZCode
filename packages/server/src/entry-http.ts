@@ -2,7 +2,7 @@ import { createLocalServices, getAppConfigDir } from "@zcode/services/node";
 import {
   materializeBundledZCodeBuiltinProviderConfig,
   readBundledZCodeBuiltinProviderConfig,
-} from "./bundledZCodeBuiltinProviderConfig.js";
+} from "./bundledMgcodeBuiltinProviderConfig.js";
 import { createHttpServer } from "./http.js";
 
 async function main(): Promise<void> {

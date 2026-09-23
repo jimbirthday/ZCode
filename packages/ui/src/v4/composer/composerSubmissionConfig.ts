@@ -1,5 +1,5 @@
 import { resolveExecutionState, type ModelSelection } from "@zcode/shared";
-import { submissionModeSchema, type SubmissionMode } from "@zcode/shared/zcode-protocol-v4";
+import { submissionModeSchema, type SubmissionMode } from "@zcode/shared/mgcode-protocol-v4";
 import type { ModelSelectionView } from "@zcode/services";
 import { validateModelSelectionOptions } from "@zcode/provider";
 

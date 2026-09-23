@@ -1,4 +1,4 @@
-import { pickProductEndpointEnv } from "@zcode/shared/zcodeEndpoint";
+import { pickProductEndpointEnv } from "@zcode/shared/mgcodeEndpoint";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -139,7 +139,7 @@ export default defineConfig([
     entry: {
       "main/index": "src/main/index.ts",
       "main/browserWebmRecorder": "src/main/browserView/electronBrowserWebmRecorder.ts",
-      "main/zcodeDataSizeWorker": "src/main/zcodeDataSizeWorker.ts",
+      "main/zcodeDataSizeWorker": "src/main/mgcodeDataSizeWorker.ts",
       // 资源管理器「存储」tab 的扫描 Worker：main 持有 StorageService，遍历放独立线程，供 new Worker(new URL()) 解析。
       "main/storageScanWorker": "src/main/storageScanWorker.ts",
     },

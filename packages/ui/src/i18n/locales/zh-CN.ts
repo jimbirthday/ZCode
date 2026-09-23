@@ -1903,7 +1903,7 @@ const zhCN: Record<string, string> = {
   "settings.taskAutoArchiveDays.option.30": "30 天后归档",
   "settings.dataBaseDir": "数据存储路径",
   "settings.dataBaseDirDescription":
-    "应用数据的根目录（默认为用户主目录），修改后会将现有数据复制到新位置。路径后缀 .zcode/v2 不可更改。",
+    "应用数据的根目录（默认为用户主目录），修改后会将现有数据复制到新位置。路径后缀 .mgcode/v2 不可更改。",
   "settings.dataBaseDirPlaceholder": "默认：用户主目录",
   "settings.dataBaseDirBrowse": "选择文件夹",
   "settings.dataBaseDirSave": "保存",
@@ -3387,7 +3387,7 @@ const zhCN: Record<string, string> = {
   "settings.skills.diagnostics.code.skill_not_found": "技能未找到",
   "settings.promptProfiles.title": "模型提示词",
   "settings.promptProfiles.description":
-    "为不同模型编写系统提示词。匹配顺序是指定模型、供应商、模型族，最后是默认。保存后，下一条消息使用这份目录。项目里的 .zcode/config.json 若也写了 promptProfiles，重启后会按配置合并覆盖这里的用户目录。",
+    "为不同模型编写系统提示词。匹配顺序是指定模型、供应商、模型族，最后是默认。保存后，下一条消息使用这份目录。项目里的 .mgcode/config.json 若也写了 promptProfiles，重启后会按配置合并覆盖这里的用户目录。",
   "settings.promptProfiles.loading": "正在读取提示词…",
   "settings.promptProfiles.empty": "还没有自定义提示词。未添加时，请求继续使用内置提示词。",
   "settings.promptProfiles.add": "添加提示词",

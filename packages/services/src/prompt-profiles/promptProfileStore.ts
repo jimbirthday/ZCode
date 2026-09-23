@@ -15,7 +15,7 @@ export class PromptProfileConfigError extends Error {
 }
 
 export function resolveUserPromptProfileConfigPath(homeDir = homedir()): string {
-  return join(homeDir, ".zcode", "cli", "config.json");
+  return join(homeDir, ".mgcode", "cli", "config.json");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

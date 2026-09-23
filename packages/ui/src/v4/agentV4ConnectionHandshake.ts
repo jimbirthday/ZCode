@@ -5,7 +5,7 @@ import {
   V4_WIRE_PROTOCOL_VERSION,
   helloMessageSchema,
   type HelloMessage,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { getV4ClientId } from "@/v4/commandFactory.js";
 
 type AgentV4HandshakeService = Pick<

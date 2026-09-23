@@ -13,7 +13,7 @@ import {
   pickProductEndpointEnv,
   resolveZaiOAuthClientId,
   resolveZaiOAuthOrigin,
-} from "@zcode/shared/zcodeEndpoint";
+} from "@zcode/shared/mgcodeEndpoint";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = resolve(HERE, "../..");

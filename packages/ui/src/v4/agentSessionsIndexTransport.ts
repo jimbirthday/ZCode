@@ -10,8 +10,8 @@ import {
   type TopicFrameDeliveryKind,
   type V4ConversationResyncResult,
   type V4SessionsIndexSubscribeResult,
-} from "@zcode/shared/zcode-protocol-v4";
-import { sessionsIndexTopic } from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
+import { sessionsIndexTopic } from "@zcode/shared/mgcode-protocol-v4";
 import { logger } from "@/logger.js";
 import { ensureAgentV4ConnectionHandshake } from "@/v4/agentV4ConnectionHandshake.js";
 import { createAckActivationBarrier } from "@/v4/ackActivationBarrier.js";

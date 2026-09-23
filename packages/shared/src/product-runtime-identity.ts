@@ -1,7 +1,8 @@
 import { join } from "node:path";
+import { PRODUCT_DATA_DIR_NAME } from "./product-data-dir.js";
 
 /** Shared by desktop and CLI. One directory, one session database. */
-export const SHARED_SESSION_DIRECTORY_SEGMENTS = [".zcode", "sessions"] as const;
+export const SHARED_SESSION_DIRECTORY_SEGMENTS = [PRODUCT_DATA_DIR_NAME, "sessions"] as const;
 export const SHARED_SESSION_DB_FILE = "db.sqlite";
 
 export const AGENT_BINARY_ENV = "ZCODE_AGENT_BINARY";

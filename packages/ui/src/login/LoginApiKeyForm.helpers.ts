@@ -5,7 +5,7 @@ import {
   type ProviderFamilyDomain,
 } from "@zcode/shared";
 import type { ModelSelectionView } from "@zcode/services";
-import { encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
+import { encodeCustomModelValue } from "@/lib/mgcodeCustomModelValue.js";
 
 export type ApiKeyProviderChoice = "mgoole" | "zai" | "bigmodel";
 

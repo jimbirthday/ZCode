@@ -129,8 +129,8 @@ import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
 import { useAutomationProjectOptions } from "@/hooks/useAutomationProjectOptions.js";
 import { useModelSelectionView } from "@/hooks/useModelSelectionView.js";
 import { resolveModelThoughtOption } from "@/lib/modelThoughtOption.js";
-import { decodeCustomModelValue, encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
-import { parseModelPickerValue } from "@/lib/zcodeSessionProjection.js";
+import { decodeCustomModelValue, encodeCustomModelValue } from "@/lib/mgcodeCustomModelValue.js";
+import { parseModelPickerValue } from "@/lib/mgcodeSessionProjection.js";
 import { startUserAction } from "@/lib/userActionTelemetry.js";
 import { logger } from "@/logger.js";
 import {

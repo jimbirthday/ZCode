@@ -3,7 +3,7 @@
 // 注意：summary.sessionEnded 是「成功轮收口」语义（completedSuccess 即 true），不是删除；
 // session.removed 只会移除实时 detail，持久行删除仍由 tasks-index row/tombstone 决定。
 import type { TraceId, ZCodeProvider, ZCodeTaskMeta } from "@zcode/shared";
-import type { SessionSummary } from "@zcode/shared/zcode-protocol-v4";
+import type { SessionSummary } from "@zcode/shared/mgcode-protocol-v4";
 import {
   attachTaskListRowActivity,
   type TaskListMetaWithActivity,

@@ -8,7 +8,7 @@ import {
   type SessionsIndexTopicFrame,
   type SessionsIndexTopicWireCandidate,
   type SessionSummary,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 
 const SUBSCRIBER_SCOPE = "window-controller";
 const MAX_STAGED_WIRES = 1_024;

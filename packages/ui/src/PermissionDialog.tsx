@@ -15,7 +15,7 @@ import {
   type ZCodePermissionRequest,
   type ZCodeProvider,
 } from "@zcode/shared";
-import { MAX_PERMISSION_FEEDBACK_CHARS } from "@zcode/shared/zcode-protocol-v4";
+import { MAX_PERMISSION_FEEDBACK_CHARS } from "@zcode/shared/mgcode-protocol-v4";
 import { Button } from "@/components/ui/button.js";
 import { cn } from "@/components/lib/utils.js";
 import { Textarea } from "@/components/ui/textarea.js";

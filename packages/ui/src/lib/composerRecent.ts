@@ -1,5 +1,5 @@
 import { modelSelectionSchema, type ModelSelection } from "@zcode/shared/model-selection";
-import { submissionModeSchema, type SubmissionMode } from "@zcode/shared/zcode-protocol-v4";
+import { submissionModeSchema, type SubmissionMode } from "@zcode/shared/mgcode-protocol-v4";
 import type { ModelSelectionView } from "@zcode/services";
 import { logger } from "@/logger.js";
 

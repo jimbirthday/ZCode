@@ -33,7 +33,7 @@ import {
   isSuspiciousEmptyModelResultMessage,
   resolveOffPeakTicketExpiredBusinessCode,
 } from "@/lib/providerBusinessError.js";
-import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
+import type { ZCodeUiError } from "@/lib/mgcodeUiError.js";
 
 const HISTORICAL_MODEL_UNAVAILABLE_MESSAGES = [
   "历史任务使用的模型已不可用",

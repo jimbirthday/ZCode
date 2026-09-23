@@ -12,7 +12,7 @@ import {
   type WindowHostControllerCursor,
   type WindowHostControllerTaskFrame,
   type WindowHostControllerTaskRow,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { logger } from "@/logger.js";
 
 interface WindowControllerTaskListRegistry {

@@ -42,7 +42,7 @@ import type {
   ZCodeAgentUpdatePluginMarketplaceParams,
   ZCodeAgentUpdatePluginParams,
   ZCodeAgentValidatePluginParams,
-} from "../zcode-agent/zcodeAgentPluginParams.js";
+} from "../mgcode-agent/mgcodeAgentPluginParams.js";
 
 export interface IPluginManagementService {
   listPlugins(params: ZCodeAgentPluginViewParams): Promise<ZCodePluginsListResult>;

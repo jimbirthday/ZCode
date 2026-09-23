@@ -2,7 +2,7 @@ import type {
   CommandPayloadMap,
   CommandType,
   WorkspaceHookReviewRequestPayload,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import type { Hook } from "@zcode/shared";
 import {
   findWorkspaceHookCommandBinding,

@@ -7,7 +7,7 @@ import {
   type SessionSummary,
   type SessionsIndexTopicFrame,
   type TopicFrameDeliveryKind,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { isZCodeFileLockTimeoutError } from "@zcode/shared";
 import { ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE } from "@zcode/services";
 import { logger } from "@/logger.js";

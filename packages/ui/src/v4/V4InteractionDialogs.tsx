@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ZCodeElicitationRequest, ZCodePermissionOption, ZCodeProvider } from "@zcode/shared";
-import type { ConversationSnapshot } from "@zcode/shared/zcode-protocol-v4";
+import type { ConversationSnapshot } from "@zcode/shared/mgcode-protocol-v4";
 import { ElicitationDialog } from "@/ElicitationDialog.js";
 import { PermissionDialog } from "@/PermissionDialog.js";
 import { useOptionalPlatform } from "@/hooks/usePlatform.js";
@@ -13,8 +13,8 @@ import {
   getTaskUiState,
   getWorkspaceState,
   useZCodeSessionStore,
-} from "@/store/zcodeSessionStore.js";
-import type { ElicitationFormDraft } from "@/store/zcodeSessionStoreTypes.js";
+} from "@/store/mgcodeSessionStore.js";
+import type { ElicitationFormDraft } from "@/store/mgcodeSessionStoreTypes.js";
 import { createCommandEnvelope } from "@/v4/commandFactory.js";
 import { pendingCommandRegistry } from "@/v4/pendingCommandRegistry.js";
 import { sendInteractionAutoResolutionSnooze } from "@/v4/interactionAutoResolutionCommand.js";

@@ -18,14 +18,14 @@ import type {
 import { isCodingPlanModelProviderId } from "@zcode/shared";
 import type { ICredentialService } from "../credential/credential.js";
 import type { IAccountRequestAuthService } from "../model-provider/accountRequestAuthService.js";
-import type { IZCodeAgentService } from "../zcode-agent/zcodeAgent.js";
+import type { IZCodeAgentService } from "../mgcode-agent/mgcodeAgent.js";
 import type { IUsageStatsService } from "./usageStats.js";
 import {
   BigModelUsageQuotaProvider,
   type UsageApiAuthorizationRequest,
   type UsageApiAuthorization,
 } from "./providers/bigmodelUsageQuotaProvider.js";
-import type { OfficialMcpCredentialSource } from "./providers/zcodeMcpQuotaProvider.js";
+import type { OfficialMcpCredentialSource } from "./providers/mgcodeMcpQuotaProvider.js";
 
 interface UsageStatsServiceDependencies {
   apiClient: ApiClient;

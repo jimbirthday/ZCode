@@ -8,7 +8,7 @@ import type {
   Locale,
 } from "@zcode/shared";
 import { ServiceChannels } from "@zcode/shared";
-import type { ConversationRow } from "@zcode/shared/zcode-protocol-v4";
+import type { ConversationRow } from "@zcode/shared/mgcode-protocol-v4";
 import { Event as RpcEvent, type Event } from "@zcode/rpc";
 
 import { createServiceDescriptor } from "../descriptors.js";

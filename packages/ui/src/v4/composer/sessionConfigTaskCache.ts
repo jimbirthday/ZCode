@@ -1,6 +1,6 @@
 import type { ZCodeConfigOption } from "@zcode/shared";
-import type { SessionConfigState } from "@zcode/shared/zcode-protocol-v4";
-import { parseModelPickerValue } from "@/lib/zcodeSessionProjection.js";
+import type { SessionConfigState } from "@zcode/shared/mgcode-protocol-v4";
+import { parseModelPickerValue } from "@/lib/mgcodeSessionProjection.js";
 
 function resolveModelDisplayValue(
   options: readonly ZCodeConfigOption[],

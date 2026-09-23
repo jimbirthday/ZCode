@@ -30,13 +30,13 @@ export function buildRemoteWorkspaceSessionServices(
     // SSH/Docker remote 项目的 skills/plugins/commands 目录位于远端文件系统。
     // 之前这里沿用本机 base services，会拿远端 workspacePath 去本机扫描，导致项目级能力读不到。
     skillsService: remoteServices.skillsService,
-    // 远端 skill 同步的 import 必须写入 SSH 主机的 ~/.zcode/skills。
-    // 如果继续沿用 base service，UI 会显示同步成功但实际写到本机 ~/.zcode/skills。
+    // 远端 skill 同步的 import 必须写入 SSH 主机的 ~/.mgcode/skills。
+    // 如果继续沿用 base service，UI 会显示同步成功但实际写到本机 ~/.mgcode/skills。
     skillSyncService: remoteServices.skillSyncService,
-    // 远端 MCP 同步的 import 必须写入 SSH 主机的 ~/.zcode/cli/config.json。
+    // 远端 MCP 同步的 import 必须写入 SSH 主机的 ~/.mgcode/cli/config.json。
     // 这里与 skillSyncService 一样走 remote service，避免把远端配置写回本机用户目录。
     mcpSyncService: remoteServices.mcpSyncService,
-    // 远端 plugin 同步会写入 SSH 主机的 ~/.zcode/plugins 和 plugins.dirs；
+    // 远端 plugin 同步会写入 SSH 主机的 ~/.mgcode/plugins 和 plugins.dirs；
     // 必须像 skill/MCP 一样走 remote service，不能沿用本机 base service。
     pluginSyncService: remoteServices.pluginSyncService,
     pluginsService: remoteServices.pluginsService,
@@ -48,7 +48,7 @@ export function buildRemoteWorkspaceSessionServices(
     // 无法读取远端待审 Hook。
     // hooks 读写（loadHooks/saveHooks）与 grantWorkspaceHookTrust 授权都必须打到远端 host。
     hooksService: remoteServices.hooksService,
-    // 模型提示词写在 Agent 所在机器的 ~/.zcode/cli/config.json，远端工作区必须走远端服务。
+    // 模型提示词写在 Agent 所在机器的 ~/.mgcode/cli/config.json，远端工作区必须走远端服务。
     promptProfileService: remoteServices.promptProfileService,
   };
 }

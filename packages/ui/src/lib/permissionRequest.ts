@@ -1,4 +1,4 @@
-import { PERMISSION_FULL_ACCESS_OPTION_ID } from "@zcode/shared/zcode-protocol-v4";
+import { PERMISSION_FULL_ACCESS_OPTION_ID } from "@zcode/shared/mgcode-protocol-v4";
 import type { ZCodePermissionOption } from "@zcode/shared";
 
 export {

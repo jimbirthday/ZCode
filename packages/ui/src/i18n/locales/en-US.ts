@@ -2015,7 +2015,7 @@ const enUS: Record<string, string> = {
   "settings.taskAutoArchiveDays.option.30": "Archive after 30 days",
   "settings.dataBaseDir": "Data storage path",
   "settings.dataBaseDirDescription":
-    "Root directory for app data (defaults to user home directory). Existing data will be copied to the new location. The .zcode/v2 suffix cannot be changed.",
+    "Root directory for app data (defaults to user home directory). Existing data will be copied to the new location. The .mgcode/v2 suffix cannot be changed.",
   "settings.dataBaseDirPlaceholder": "Default: user home directory",
   "settings.dataBaseDirBrowse": "Choose folder",
   "settings.dataBaseDirSave": "Save",
@@ -3607,7 +3607,7 @@ const enUS: Record<string, string> = {
   "settings.skills.diagnostics.code.skill_not_found": "Skill not found",
   "settings.promptProfiles.title": "Model prompts",
   "settings.promptProfiles.description":
-    "Write a system prompt for each model. Matching order is exact model, provider, family, then default. The next message uses the saved catalog. A promptProfiles entry in the project .zcode/config.json replaces this user catalog after the agent restarts.",
+    "Write a system prompt for each model. Matching order is exact model, provider, family, then default. The next message uses the saved catalog. A promptProfiles entry in the project .mgcode/config.json replaces this user catalog after the agent restarts.",
   "settings.promptProfiles.loading": "Loading prompts…",
   "settings.promptProfiles.empty":
     "No custom prompts yet. Requests keep the built-in prompt until you add one.",

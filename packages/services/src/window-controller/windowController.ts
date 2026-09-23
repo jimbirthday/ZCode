@@ -11,14 +11,14 @@ import type {
   WindowHostControllerTaskRow,
   WindowHostControllerWorkspaceFrame,
   WindowHostTaskAddress,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { createServiceDescriptor } from "../descriptors.js";
-import type { ZCodeArchivedTaskDeletionResult } from "#src/session/zcodeTaskService.js";
+import type { ZCodeArchivedTaskDeletionResult } from "#src/session/mgcodeTaskService.js";
 import type {
   ZCodeTaskListItem,
   ZCodeTaskListQuery,
   ZCodeTaskListResult,
-} from "../session/zcodeTaskListTypes.js";
+} from "../session/mgcodeTaskListTypes.js";
 
 export type WindowHostControllerMutation =
   | { kind: "pin"; pinned: boolean }

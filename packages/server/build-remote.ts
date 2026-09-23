@@ -35,6 +35,9 @@ const buildResult = await build({
   format: "cjs",
   target: "node22",
   plugins: [nativeAddonPlugin],
+  // 服务端包本身不声明 @zcode/zcode-cua，依赖经 @zcode/services 的 node_modules 解析。
+  // 只从 server 目录打包时 esbuild 找不到这个 workspace 包。
+  nodePaths: ["../services/node_modules"],
   // CJS 环境没有 import.meta.url，通过 banner 注入等价变量，
   // 再用 define 全局替换，这样源码无需关心最终打包格式。
   banner: {

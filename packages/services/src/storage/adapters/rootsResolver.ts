@@ -5,8 +5,9 @@
 import { join, resolve } from "node:path";
 import type { RootsResolverPort } from "../app/ports.js";
 import type { StorageRootSpec } from "@zcode/shared";
+import { PRODUCT_DATA_DIR_NAME } from "@zcode/shared/product-data-dir";
 
-const ZCODE_DATA_DIR_NAME = ".zcode";
+const ZCODE_DATA_DIR_NAME = PRODUCT_DATA_DIR_NAME;
 
 export function resolveStorageRoots(params: {
   homeDir: string;

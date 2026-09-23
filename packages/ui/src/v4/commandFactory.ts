@@ -7,7 +7,7 @@ import {
   type CommandEnvelope,
   type CommandPayloadMap,
   type CommandType,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { uuidv7 } from "@zcode/shared";
 export { uuidv7 } from "@zcode/shared";
 

@@ -5,8 +5,8 @@ import type {
   ControllerSubscribeParams,
   WindowHostControllerTaskRow,
   WindowHostTaskAddress,
-} from "@zcode/shared/zcode-protocol-v4";
-import { matchesTaskListMembershipKind } from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
+import { matchesTaskListMembershipKind } from "@zcode/shared/mgcode-protocol-v4";
 import type {
   IWindowControllerService,
   IZCodeAgentService,
@@ -76,7 +76,7 @@ function mutationParams(address: WindowHostTaskAddress) {
 }
 
 function sessionOverlay(
-  summary: import("@zcode/shared/zcode-protocol-v4").SessionSummary,
+  summary: import("@zcode/shared/mgcode-protocol-v4").SessionSummary,
 ): WindowHostControllerSessionOverlay {
   const liveStatus: WindowHostControllerSessionOverlay["liveStatus"] =
     summary.pendingInteraction ||

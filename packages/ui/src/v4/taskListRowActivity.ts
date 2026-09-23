@@ -3,7 +3,7 @@ import type {
   PendingInteractionSummary,
   SessionSummary,
   SessionWorkflowActivity,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 
 // UI-only sidecar：不进入 shared task meta/schema，也不写回 tasks-index。
 // 字段名使用明确的内部前缀，避免调用方把它误当成持久化 task 属性。

@@ -7,7 +7,7 @@ import {
   getWorkspaceDisplayedTaskState,
   getWorkspaceInitState,
   useZCodeSessionStore,
-} from "@/store/zcodeSessionStore.js";
+} from "@/store/mgcodeSessionStore.js";
 
 export function useWorkspaceShellLifecycle({
   workspaceAbsPath,

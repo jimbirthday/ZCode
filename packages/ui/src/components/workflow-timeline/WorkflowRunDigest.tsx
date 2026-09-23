@@ -6,7 +6,7 @@ import {
   SquareIcon,
 } from "lucide-react";
 import { TID_CHAT_WORKFLOW_RUN_DIGEST, testId } from "@zcode/shared";
-import type { WorkflowRunState } from "@zcode/shared/zcode-protocol-v4";
+import type { WorkflowRunState } from "@zcode/shared/mgcode-protocol-v4";
 import { cn } from "@/components/lib/utils.js";
 import { Button } from "@/components/ui/button.js";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";

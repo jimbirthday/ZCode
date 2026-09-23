@@ -5,8 +5,8 @@ import { tmpdir } from "node:os";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { DEFAULT_ZAI_BUSINESS_BASE_URL, DEFAULT_ZCODE_ENDPOINT_ORIGIN } from "../src/zcodeEndpoint.js";
-import { ZCODE_AGENT_RUNTIME } from "../src/zcode-agent-runtime.js";
+import { DEFAULT_ZAI_BUSINESS_BASE_URL, DEFAULT_ZCODE_ENDPOINT_ORIGIN } from "../src/mgcodeEndpoint.js";
+import { ZCODE_AGENT_RUNTIME } from "../src/mgcode-agent-runtime.js";
 import {
   agentLookupUsesBundledRuntime,
   bundledLauncherScript,
@@ -15,7 +15,7 @@ import {
   resolveDefaultProductEndpoints,
   resolveSharedSessionDbPath,
 } from "../src/product-runtime-identity.js";
-import { getDefaultSessionDbPath } from "../../../apps/zcode-cli/packages/adapters/src/storage/session-store/paths.js";
+import { getDefaultSessionDbPath } from "../../../apps/mgcode-cli/zcode-cli/packages/adapters/src/storage/session-store/paths.js";
 import { resolveSharedSessionDbPath as desktopSessionDbPath } from "../../desktop/src/shared/sessionDirectory.js";
 
 test("default endpoints and agent lookup do not target vendor hosts or glm", () => {
@@ -43,7 +43,7 @@ test("desktop and CLI session databases resolve to one directory", () => {
   const shared = resolveSharedSessionDbPath(homedir());
   assert.equal(getDefaultSessionDbPath(), shared);
   assert.equal(desktopSessionDbPath(homedir()), shared);
-  assert.match(shared, /\.zcode\/sessions\/db\.sqlite$/);
+  assert.match(shared, /\.mgcode\/sessions\/db\.sqlite$/);
 });
 
 test("desktop packs the agent resource the lookup reads, and the CLI package installs runtime/node", async () => {
@@ -53,7 +53,7 @@ test("desktop packs the agent resource the lookup reads, and the CLI package ins
   );
   assert.match(builder, /to: "agent"/);
   assert.doesNotMatch(builder, /to: "glm"/);
-  const { installBundledNodeRuntime } = await import("../../../scripts/zcode-distribution/bundled-node.mjs");
+  const { installBundledNodeRuntime } = await import("../../../scripts/mgcode-distribution/bundled-node.mjs");
   const packageRoot = mkdtempSync(`${tmpdir()}/zcode-runtime-`);
   const fakeNode = `${packageRoot}/fake-node`;
   writeFileSync(fakeNode, "#!/bin/sh\necho node\n");
@@ -61,7 +61,7 @@ test("desktop packs the agent resource the lookup reads, and the CLI package ins
   assert.match(installed, /\/runtime\/node$/);
   assert.equal(readFileSync(installed, "utf8").includes("echo node"), true);
   const buildSource = readFileSync(
-    new URL("../../../scripts/build-zcode.mjs", import.meta.url),
+    new URL("../../../scripts/build-mgcode.mjs", import.meta.url),
     "utf8",
   );
   assert.match(buildSource, /await installBundledNodeRuntime\(packageRoot\)/);
@@ -70,7 +70,7 @@ test("desktop packs the agent resource the lookup reads, and the CLI package ins
 test("shipped launcher executes the bundled runtime", async () => {
   const script = bundledLauncherScript("$ROOT");
   const installer = readFileSync(
-    new URL("../../../scripts/zcode-distribution/installer.mjs", import.meta.url),
+    new URL("../../../scripts/mgcode-distribution/installer.mjs", import.meta.url),
     "utf8",
   );
   assert.equal(launcherRequiresSystemNode(script), false);
@@ -86,7 +86,7 @@ test("shipped launcher executes the bundled runtime", async () => {
   const fakeNode = join(packageRoot, "fake-node");
   writeFileSync(fakeNode, "#!/bin/sh\necho bundled-runtime\nexit 0\n");
   chmodSync(fakeNode, 0o755);
-  const { installBundledNodeRuntime } = await import("../../../scripts/zcode-distribution/bundled-node.mjs");
+  const { installBundledNodeRuntime } = await import("../../../scripts/mgcode-distribution/bundled-node.mjs");
   await installBundledNodeRuntime(packageRoot, fakeNode);
   mkdirSync(join(packageRoot, "agent"), { recursive: true });
   writeFileSync(join(packageRoot, "agent", "zcode.cjs"), "#!/bin/sh\nexit 0\n");

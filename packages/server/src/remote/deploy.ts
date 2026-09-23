@@ -9,7 +9,7 @@ import {
   type RemoteResourcePackageSelection,
 } from "@zcode/shared";
 import type { IRemoteBackend, RemoteEnvironment } from "./backend.js";
-import { deployZCodeAgentRuntime } from "./zcodeAgentDeploy.js";
+import { deployZCodeAgentRuntime } from "./mgcodeAgentDeploy.js";
 import {
   deployNodePtyPrebuilds,
   deployNodeRuntime,
@@ -27,7 +27,7 @@ import {
 import { quotePosixPathArg } from "@zcode/server/remote/posixShell.js";
 import { checkServerBundleRequiredMarkers } from "@zcode/server/remote/serverBundleDeployCheck.js";
 import { deployRuntimeTools } from "@zcode/server/remote/runtimeToolDeploy.js";
-import { REMOTE_AGENT_OFFICIAL_PLUGIN_REQUIRED_RELATIVE_PATHS } from "@zcode/server/remote/zcodeAgentOfficialPluginAssets.js";
+import { REMOTE_AGENT_OFFICIAL_PLUGIN_REQUIRED_RELATIVE_PATHS } from "@zcode/server/remote/mgcodeAgentOfficialPluginAssets.js";
 import {
   ensureRemoteReleaseDirFromCdn,
   selectRemoteAssetManifestComponents,

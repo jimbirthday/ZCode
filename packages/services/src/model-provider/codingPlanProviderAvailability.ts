@@ -18,7 +18,7 @@ import {
 import { createServiceLogger } from "#src/logger/serviceLogger.js";
 import { readApiJson } from "../providers/api/apiJson.js";
 import { normalizeApiKeyForHeader } from "../providers/api/index.js";
-import { resolveBigModelStartPlanZcodeJwt } from "./bigmodelStartPlanZcodeJwt.js";
+import { resolveBigModelStartPlanZcodeJwt } from "./bigmodelStartPlanMgcodeJwt.js";
 import {
   buildZaiStartPlanBalanceUrl,
   fetchZaiStartPlanBalanceEnvelope,

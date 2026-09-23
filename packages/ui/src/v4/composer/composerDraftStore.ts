@@ -10,8 +10,8 @@
 // 与「v4 composer 不做附件草稿持久化」的裁决一致）。
 import { logger } from "@/logger.js";
 import { modelSelectionSchema, type ModelSelection } from "@zcode/shared";
-import { submissionModeSchema, type SubmissionMode } from "@zcode/shared/zcode-protocol-v4";
-import type { ComposerMentionPrefill } from "@/store/zcodeSessionStoreTypes.js";
+import { submissionModeSchema, type SubmissionMode } from "@zcode/shared/mgcode-protocol-v4";
+import type { ComposerMentionPrefill } from "@/store/mgcodeSessionStoreTypes.js";
 
 export interface V4ComposerDraft {
   text: string;

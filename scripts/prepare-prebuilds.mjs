@@ -100,7 +100,7 @@ const remoteOfficialPluginPackages = [
     // 该 runtime 现由 @zcode/node-repl-host 提供（见下一个条目），browser-use 只带自己的
     // client script 与 skill/docs。
     packageName: "@zcode/browser-use-plugin",
-    relativePath: "apps/zcode-cli/packages/browser-use-plugin",
+    relativePath: "apps/mgcode-cli/zcode-cli/packages/browser-use-plugin",
     requiresRuntime: true,
     requiredRuntimePaths: browserUseRequiredRuntimePaths,
     runtimeBuildScript: "scripts/build.mjs",
@@ -110,7 +110,7 @@ const remoteOfficialPluginPackages = [
     // node_repl 宿主：Browser Use 与 Computer Use 共用的 MCP runtime。远端 shared-host 缺它
     // 就没有 mcp__node_repl__js，bua/cua 两边都会连不上。
     packageName: "@zcode/node-repl-host",
-    relativePath: "apps/zcode-cli/packages/node-repl-host",
+    relativePath: "apps/mgcode-cli/zcode-cli/packages/node-repl-host",
     requiresRuntime: true,
     requiredRuntimePaths: ["dist/mcp/server.js"],
     runtimeBuildScript: "scripts/build.mjs",
@@ -119,7 +119,7 @@ const remoteOfficialPluginPackages = [
 ];
 const remoteOfficialPluginTopLevelPaths = new Set([
   ".mcp.json",
-  ".zcode-plugin",
+  ".mgcode-plugin",
   "README.md",
   // 生产远程预构建有独立顶层白名单，遗漏 agents 会在上传前永久裁掉子代理。
   "agents",
@@ -145,12 +145,12 @@ function shouldCopyOfficialPluginAsset(sourcePath) {
   return !excludedOfficialPluginAssetNames.has(name) && !name.endsWith(".pyc");
 }
 const remoteOfficialPluginRequiredPaths = [
-  "packages/browser-use-plugin/.zcode-plugin/plugin.json",
-  "packages/node-repl-host/.zcode-plugin/plugin.json",
+  "packages/browser-use-plugin/.mgcode-plugin/plugin.json",
+  "packages/node-repl-host/.mgcode-plugin/plugin.json",
 ];
 
 function readZCodeAgentRuntimeVersion() {
-  const runtimeSourcePath = join(rootDir, "packages/shared/src/zcode-agent-runtime.ts");
+  const runtimeSourcePath = join(rootDir, "packages/shared/src/mgcode-agent-runtime.ts");
   const runtimeSource = readFileSync(runtimeSourcePath, "utf8");
   const match = runtimeSource.match(/version:\s*["']([^"']+)["']/);
   if (!match?.[1]) {
@@ -408,7 +408,7 @@ function buildRemoteOfficialPluginRuntimes() {
 
     runCommand(
       pnpmCommand,
-      ["--dir", join(rootDir, "apps/zcode-cli"), "--filter", plugin.packageName, "build"],
+      ["--dir", join(rootDir, "apps/mgcode-cli/zcode-cli"), "--filter", plugin.packageName, "build"],
       {
         cwd: rootDir,
         env: process.env,
@@ -455,7 +455,7 @@ function assertRemoteOfficialPluginRuntime(plugin) {
 function stageRemoteOfficialPlugins(glmDir) {
   for (const plugin of remoteOfficialPluginPackages) {
     const sourceRoot = join(rootDir, plugin.relativePath);
-    const manifestPath = join(sourceRoot, ".zcode-plugin", "plugin.json");
+    const manifestPath = join(sourceRoot, ".mgcode-plugin", "plugin.json");
     if (!existsSync(manifestPath)) {
       throw new Error(
         `[prepare-prebuilds] missing remote official plugin manifest: ${manifestPath}`,
@@ -499,7 +499,7 @@ function stageRemoteAgentBundles() {
   // browser-use runtime 的 tsc 依赖 @zcode/core/dist。远端资产也必须先构建
   // agent CLI 依赖，避免 CI 干净检出时被开发机缓存掩盖的 TS2307。
   buildRemoteOfficialPluginRuntimes();
-  const cliBundlePath = join(rootDir, "apps/zcode-cli/packages/cli/dist/zcode.cjs");
+  const cliBundlePath = join(rootDir, "apps/mgcode-cli/zcode-cli/packages/cli/dist/zcode.cjs");
   if (!existsSync(cliBundlePath)) {
     throw new Error(`[prepare-prebuilds] expected cli bundle missing: ${cliBundlePath}`);
   }

@@ -11,7 +11,7 @@ import {
   zcodeSessionStateSnapshotSchema,
 } from "@zcode/shared";
 import { TaskIndexRepo } from "../src/session/taskIndexRepo.js";
-import { createZCodeTaskServiceAdapter } from "../src/zcode-agent/zcodeTaskServiceAdapter.js";
+import { createZCodeTaskServiceAdapter } from "../src/mgcode-agent/mgcodeTaskServiceAdapter.js";
 import {
   getLegacyTaskSessionSnapshotPath,
   getZCodeDataRootDir,

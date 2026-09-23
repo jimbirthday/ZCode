@@ -10,6 +10,7 @@ import {
   PERSONAL_PROVIDER_CONFIG_FILE_NAME,
 } from "@zcode/provider-node";
 import { getAppConfigDir as resolveAppConfigDir } from "./paths.js";
+import { PRODUCT_DATA_DIR_NAME } from "@zcode/shared/product-data-dir";
 import {
   buildLocalMediaPreviewUrl,
   isProviderProvisioningAccountCredentialKey,
@@ -84,27 +85,27 @@ export {
 } from "./setting/settingService.js";
 export { createCredentialService } from "./credential/credentialService.js";
 export { createBroadcastService } from "./broadcast/broadcastService.js";
-export { createZCodeAgentService } from "./zcode-agent/zcodeAgentService.js";
-export { createZCodeTaskServiceAdapter } from "./zcode-agent/zcodeTaskServiceAdapter.js";
-export { createZCodeSessionService } from "./zcode-session/zcodeSessionService.js";
+export { createZCodeAgentService } from "./mgcode-agent/mgcodeAgentService.js";
+export { createZCodeTaskServiceAdapter } from "./mgcode-agent/mgcodeTaskServiceAdapter.js";
+export { createZCodeSessionService } from "./mgcode-session/mgcodeSessionService.js";
 export {
   resolveDefaultZCodeAgentCommand,
   ZCodeAgentProcessManager,
-} from "./zcode-agent/zcodeAgentProcessManager.js";
+} from "./mgcode-agent/mgcodeAgentProcessManager.js";
 export type {
   ZCodeAgentCommand,
   ZCodeAgentCommandResolver,
   ZCodeAgentCommandResolverContext,
   ZCodeAgentProcessManagerOptions,
-} from "./zcode-agent/zcodeAgentProcessManager.js";
-export { ZCodeProtocolClient } from "./zcode-agent/zcodeProtocolClient.js";
-export type { ZCodeProtocolTransport } from "./zcode-agent/zcodeProtocolTransport.js";
-export { ZCodeStdioTransport } from "./zcode-agent/zcodeStdioTransport.js";
+} from "./mgcode-agent/mgcodeAgentProcessManager.js";
+export { ZCodeProtocolClient } from "./mgcode-agent/mgcodeProtocolClient.js";
+export type { ZCodeProtocolTransport } from "./mgcode-agent/mgcodeProtocolTransport.js";
+export { ZCodeStdioTransport } from "./mgcode-agent/mgcodeStdioTransport.js";
 export {
   getZCodeStdioTapDevLogDir,
   readZCodeStdioTapDevState,
   setZCodeStdioTapDevEnabled,
-} from "./zcode-agent/zcodeStdioTapDevConfig.js";
+} from "./mgcode-agent/mgcodeStdioTapDevConfig.js";
 export type { ZCodeStdioTapDevState } from "@zcode/shared";
 export {
   createCuaHelperInstaller,
@@ -293,10 +294,10 @@ import { ISettingService } from "./setting/setting.js";
 import { IOnboardingRecordService } from "./onboarding/onboardingRecord.js";
 import { ICredentialService } from "./credential/credential.js";
 import { IBroadcastService } from "./broadcast/broadcast.js";
-import { IZCodeTaskService } from "./session/zcodeTaskService.js";
-import { IZCodeAgentService } from "./zcode-agent/zcodeAgent.js";
-import type { CuaOperationStateReporter } from "./zcode-agent/cuaOperationTurnTracker.js";
-import { IZCodeSessionService } from "./zcode-session/zcodeSession.js";
+import { IZCodeTaskService } from "./session/mgcodeTaskService.js";
+import { IZCodeAgentService } from "./mgcode-agent/mgcodeAgent.js";
+import type { CuaOperationStateReporter } from "./mgcode-agent/cuaOperationTurnTracker.js";
+import { IZCodeSessionService } from "./mgcode-session/mgcodeSession.js";
 import {
   createUnsupportedConversationShareService,
   IConversationShareService,
@@ -342,13 +343,13 @@ import { createLegacyTeamOrganizationResolver } from "./model-provider/legacyTea
 import { createObservableSettingService } from "./setting/observableSettingService.js";
 import { createCredentialService } from "./credential/credentialService.js";
 import { createBroadcastService } from "./broadcast/broadcastService.js";
-import { createZCodeAgentService } from "./zcode-agent/zcodeAgentService.js";
-import type { ZCodeAgentCommandResolver } from "./zcode-agent/zcodeAgentProcessManager.js";
-import { buildAgentTelemetrySpawnEnv } from "./zcode-agent/agentTelemetryEnv.js";
-import { resolveZCodeAgentPresentationSurface } from "./zcode-agent/zcodeAgentPresentationSurface.js";
-import { createZCodeTaskServiceAdapter } from "./zcode-agent/zcodeTaskServiceAdapter.js";
-import { createZCodeSessionService } from "./zcode-session/zcodeSessionService.js";
-import { createZCodeTaskIndexSyncer } from "./zcode-agent/zcodeTaskIndexSyncer.js";
+import { createZCodeAgentService } from "./mgcode-agent/mgcodeAgentService.js";
+import type { ZCodeAgentCommandResolver } from "./mgcode-agent/mgcodeAgentProcessManager.js";
+import { buildAgentTelemetrySpawnEnv } from "./mgcode-agent/agentTelemetryEnv.js";
+import { resolveZCodeAgentPresentationSurface } from "./mgcode-agent/mgcodeAgentPresentationSurface.js";
+import { createZCodeTaskServiceAdapter } from "./mgcode-agent/mgcodeTaskServiceAdapter.js";
+import { createZCodeSessionService } from "./mgcode-session/mgcodeSessionService.js";
+import { createZCodeTaskIndexSyncer } from "./mgcode-agent/mgcodeTaskIndexSyncer.js";
 import { TaskIndexRepo } from "./session/taskIndexRepo.js";
 import type { SessionMessageSendRequested } from "#src/session/sessionMailbox.js";
 import { createFileWatcherService } from "./fileWatcher/fileWatcherService.js";
@@ -356,7 +357,7 @@ import { createOAuthService } from "./oauth/oauthService.js";
 import { isCurrentOAuthCredentialRequest } from "#src/oauth/oauthUnauthorizedRequest.js";
 import { createOAuthProviderLogoutHandler } from "./oauth/oauthProviderLogout.js";
 import { OAuthCredentialRepo } from "./oauth/repo/oauthCredentialRepo.js";
-import { readLegacyZCodeConfigProviders } from "./model-provider/legacyZCodeConfigProviderReader.js";
+import { readLegacyZCodeConfigProviders } from "./model-provider/legacyMgcodeConfigProviderReader.js";
 import { resolveAccountTeamPlanRuntimeApiKey } from "./model-provider/accountProviderTeamPlanRequestKey.js";
 import { createAccountProviderCredentialStore } from "./model-provider/accountProviderCredentialStore.js";
 import { createAccountProviderCredentialService } from "./model-provider/accountProviderCredentialService.js";
@@ -370,7 +371,7 @@ import { bindAccountProviderInvalidation } from "./model-provider/accountProvide
 import { AccountProviderApiClient } from "./model-provider/accountProviderApiClient.js";
 import { AccountProviderApiKeyResolver } from "./model-provider/accountProviderApiKeyResolver.js";
 import { createProviderConfigRuntime } from "./model-provider/providerConfigRuntime.js";
-import { fetchZCodeBuiltinRemoteRelease } from "./model-provider/zcodeBuiltinRemoteConfig.js";
+import { fetchZCodeBuiltinRemoteRelease } from "./model-provider/mgcodeBuiltinRemoteConfig.js";
 import {
   createProviderRuntimeFromConfigRuntime,
   type ProviderRuntime,
@@ -1071,7 +1072,7 @@ export { isOfficialCuaPluginEnabledForWorkspace };
 
 export function hasGlobalCliZCodeCuaServer(env: NodeJS.ProcessEnv = process.env): boolean {
   const home = env.HOME?.trim() || homedir();
-  const configPath = join(home, ".zcode", "cli", "config.json");
+  const configPath = join(home, ".mgcode", "cli", "config.json");
   let parsed: unknown;
   try {
     parsed = JSON.parse(readFileSync(configPath, "utf8"));
@@ -1802,7 +1803,7 @@ export function createLocalServices(options: {
     const socketPath = resolveBrokerSocketPath();
     // standaloneHelperCandidatePaths 未在上游 exports 白名单——此处按同一规则枚举安装候选
     //（dev-desktop → dev/ 前缀；app 名一律取 helperConstants，不写字面量）。
-    const home = process.env.ZCODE_HOME?.trim() || join(homedir(), ".zcode");
+    const home = process.env.ZCODE_HOME?.trim() || join(homedir(), PRODUCT_DATA_DIR_NAME);
     const baseRoot = join(home, "computer-use");
     // 安装布局见上游 helperLauncher.resolveCuaHelperInstallRoot：dev 是独立子根 `dev/` 且 app
     // 名换成 DEV_HELPER_APP_NAME；preview 是独立子根 `preview/` 但**沿用**稳定 app 名

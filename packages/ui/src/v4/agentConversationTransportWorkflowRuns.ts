@@ -17,7 +17,7 @@ import type {
   V4ConversationWorkflowRunEventsResult,
   V4ConversationWorkflowRunsParams,
   V4ConversationWorkflowRunsResult,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 
 export function createWorkflowRunTransportMethods(input: {
   agentService: Pick<

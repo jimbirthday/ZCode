@@ -21,11 +21,11 @@ import { stageAgentBundle } from "./stage-agent-bundle.mjs";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const desktopRoot = resolve(scriptDir, "..");
 const repoRoot = resolve(desktopRoot, "..", "..");
-const cliBundlePath = resolve(repoRoot, "apps/zcode-cli/packages/cli/dist/zcode.cjs");
-const adaptersRoot = resolve(repoRoot, "apps/zcode-cli/packages/adapters");
+const cliBundlePath = resolve(repoRoot, "apps/mgcode-cli/zcode-cli/packages/cli/dist/zcode.cjs");
+const adaptersRoot = resolve(repoRoot, "apps/mgcode-cli/zcode-cli/packages/adapters");
 const pnpmRunEnv = {
   ...process.env,
-  // pnpm 11 会在 apps/zcode-cli 子 workspace 执行 run 前触发 install；
+  // pnpm 11 会在 apps/mgcode-cli/zcode-cli 子 workspace 执行 run 前触发 install；
   // 子 workspace 不能解析根 workspace 的 @zcode/shared，Docker/web app 打包会因此卡在插件 runtime 构建。
   PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false",
 };
@@ -93,7 +93,7 @@ const officialPluginPackages = [
     // browser-use 只携带自己的 client script 与 skill/docs；node_repl MCP runtime 归
     // @zcode/node-repl-host（见上方常量注释）。
     packageName: "@zcode/browser-use-plugin",
-    relativePath: "apps/zcode-cli/packages/browser-use-plugin",
+    relativePath: "apps/mgcode-cli/zcode-cli/packages/browser-use-plugin",
     requiresRuntime: true,
     requiredRuntimePaths: browserUseRequiredRuntimePaths,
     runtimeBuildScript: "scripts/build.mjs",
@@ -105,7 +105,7 @@ const officialPluginPackages = [
     // 它没有 listing（不进插件市场展示面），但生产包首启 seed 必须拿到它的 dist runtime，
     // 否则 bua/cua 任一开启时都会连不上 node_repl。
     packageName: "@zcode/node-repl-host",
-    relativePath: "apps/zcode-cli/packages/node-repl-host",
+    relativePath: "apps/mgcode-cli/zcode-cli/packages/node-repl-host",
     requiresRuntime: true,
     requiredRuntimePaths: ["dist/mcp/server.js"],
     runtimeBuildScript: "scripts/build.mjs",
@@ -114,7 +114,7 @@ const officialPluginPackages = [
 ];
 const includedOfficialPluginTopLevelPaths = new Set([
   ".mcp.json",
-  ".zcode-plugin",
+  ".mgcode-plugin",
   "README.md",
   // Electron 生产资源复制有独立白名单，遗漏 agents 会让首启 filesystem seed 永久缺少子代理。
   "agents",
@@ -167,7 +167,7 @@ function buildOfficialPluginRuntimes() {
 
     runCommand(
       "pnpm",
-      ["--dir", resolve(repoRoot, "apps/zcode-cli"), "--filter", plugin.packageName, "build"],
+      ["--dir", resolve(repoRoot, "apps/mgcode-cli/zcode-cli"), "--filter", plugin.packageName, "build"],
       {
         cwd: repoRoot,
         env: pnpmRunEnv,
@@ -223,7 +223,7 @@ function stageBundle() {
 function stageOfficialPlugins() {
   for (const plugin of officialPluginPackages) {
     const sourceRoot = resolve(repoRoot, plugin.relativePath);
-    const manifestPath = resolve(sourceRoot, ".zcode-plugin", "plugin.json");
+    const manifestPath = resolve(sourceRoot, ".mgcode-plugin", "plugin.json");
     if (!existsSync(manifestPath)) {
       throw new Error(`[prepare:agent-bundle] missing official plugin manifest: ${manifestPath}`);
     }

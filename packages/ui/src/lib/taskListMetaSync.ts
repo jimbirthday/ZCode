@@ -1,4 +1,4 @@
-import { useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
+import { useZCodeSessionStore } from "@/store/mgcodeSessionStore.js";
 import { removeTaskFromTaskQueryCaches } from "@/store/taskQueryCacheStore.js";
 
 export function removeTaskFromTaskCaches(params: {

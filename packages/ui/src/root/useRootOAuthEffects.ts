@@ -24,7 +24,7 @@ import {
 } from "@/root/oauthProviderFamilySelectionRefresh.js";
 import { readBrowserAccountSession, userInfoFromAccountSession } from "@/account/mgooleAccount.js";
 import { applyCachedOAuthSessionRestoreResult } from "@/root/oauthCachedSessionRestore.js";
-import { markZcodeJwtInvalidRestart } from "@/root/zcodeJwtInvalidRestartMarker.js";
+import { markZcodeJwtInvalidRestart } from "@/root/mgcodeJwtInvalidRestartMarker.js";
 import { shouldApplyOAuthPollingFailure } from "@/root/oauthLoginAttemptGuard.js";
 import { useAccountConnectionLossNotification } from "@/root/useAccountConnectionLossNotification.js";
 

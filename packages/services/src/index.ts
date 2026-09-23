@@ -95,7 +95,7 @@ export type {
 } from "./broadcast/broadcast.js";
 
 // ZCode task wrapper service — task 列表/置顶/归档等 app 侧包装状态入口。
-export { IZCodeTaskService } from "./session/zcodeTaskService.js";
+export { IZCodeTaskService } from "./session/mgcodeTaskService.js";
 export type {
   ZCodeArchivedTaskDeletionResult,
   ZCodeModelTrajectory,
@@ -122,8 +122,8 @@ export type {
   ZCodeGroupedTaskViewTopLevelNodeRef,
   ZCodeTaskGroup,
   ZCodeTaskGroupColor,
-} from "./session/zcodeTaskService.js";
-export type { ZCodeTaskListItem } from "./session/zcodeTaskListTypes.js";
+} from "./session/mgcodeTaskService.js";
+export type { ZCodeTaskListItem } from "./session/mgcodeTaskListTypes.js";
 
 export { IWindowControllerService } from "./window-controller/windowController.js";
 export type {
@@ -138,21 +138,21 @@ export {
   IZCodeAgentService,
   type ZCodeAgentLocalRuntimeChildProcesses,
   ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE,
-} from "./zcode-agent/zcodeAgent.js";
+} from "./mgcode-agent/mgcodeAgent.js";
 export {
   isZCodeAgentMcpStatusModeUnsupportedError,
   ZCODE_AGENT_MCP_STATUS_MODE_UNSUPPORTED_ERROR_CODE,
   ZCodeAgentMcpStatusModeUnsupportedError,
-} from "./zcode-agent/zcodeAgentErrors.js";
+} from "./mgcode-agent/mgcodeAgentErrors.js";
 export {
   createZCodeAgentConnectionScope,
   readTrustedZCodeAgentV4Connection,
-} from "./zcode-agent/zcodeAgentConnectionScope.js";
+} from "./mgcode-agent/mgcodeAgentConnectionScope.js";
 export type {
   ZCodeAgentConnectionScope,
   ZCodeAgentV4ClientMode,
   ZCodeAgentV4ConnectionContext,
-} from "./zcode-agent/zcodeAgentConnectionScope.js";
+} from "./mgcode-agent/mgcodeAgentConnectionScope.js";
 export type {
   ZCodeAgentAttachmentBeginParams,
   ZCodeAgentAttachmentChunkParams,
@@ -175,10 +175,10 @@ export type {
   ZCodeAgentSetModelParams,
   ZCodeAgentSetThoughtLevelParams,
   ZCodeAgentWorkspaceTarget,
-} from "./zcode-agent/zcodeAgent.js";
+} from "./mgcode-agent/mgcodeAgent.js";
 
 // ZCode session service — app-facing session facade without ZCode Agent naming.
-export { IZCodeSessionService } from "./zcode-session/zcodeSession.js";
+export { IZCodeSessionService } from "./mgcode-session/mgcodeSession.js";
 export type {
   ZCodeSessionCreateParams,
   ZCodeSessionEventsParams,
@@ -194,7 +194,7 @@ export type {
   ZCodeSessionSubscribeParams,
   ZCodeTaskTarget,
   ZCodeSessionWorkspaceTarget,
-} from "./zcode-session/zcodeSession.js";
+} from "./mgcode-session/mgcodeSession.js";
 
 // Hooks service — IHooksService is both a type (interface) and value (descriptor).
 export { IHooksService } from "./hooks/hooks.js";

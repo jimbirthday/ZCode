@@ -51,7 +51,7 @@ import type { IFeedbackService } from "@zcode/services";
 import type { IPlatformService } from "@zcode/shared";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
-import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
+import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/mgcodeSessionStore.js";
 
 export { SubmitProgressView } from "@/feedback/FeedbackSubmitProgressView.js";
 export { readCurrentAgentModelContext } from "@/feedback/feedbackSubmitModelContext.js";

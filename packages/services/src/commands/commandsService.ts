@@ -3,6 +3,7 @@ import { access, lstat, mkdir, readFile, readdir, rm, writeFile } from "node:fs/
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { PRODUCT_DATA_DIR_NAME } from "@zcode/shared/product-data-dir";
 import {
   ZCODE_COMMAND_AGENT_SOURCE,
   ZCODE_COMMAND_AGENT_SOURCES,
@@ -52,8 +53,8 @@ const CODEX_PLUGIN_MANIFEST_PATH = join(".codex-plugin", "plugin.json");
 const ZCODE_COMMAND_DESCRIPTOR: CommandAgentSourceDescriptor = {
   agentSource: "zcodeAgent",
   directorySource: "zcode",
-  userDirectorySegments: [".zcode", "commands"],
-  workspaceDirectorySegments: [".zcode", "commands"],
+  userDirectorySegments: [".mgcode", "commands"],
+  workspaceDirectorySegments: [".mgcode", "commands"],
   fileExtension: ".md",
   format: "markdown",
   namespaceSeparator: "/",
@@ -86,7 +87,7 @@ function getUserCommandsRoot(agentSource?: CommandAgentSource): string {
 }
 
 function getUserCliConfigPath(): string {
-  return join(resolveUserHomeDir(), ".zcode", "cli", "config.json");
+  return join(resolveUserHomeDir(), ".mgcode", "cli", "config.json");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -203,7 +204,7 @@ function readStorageDirFromConfig(config: Record<string, unknown>): string {
   const storage = isRecord(config.storage) ? config.storage : {};
   return typeof storage.dir === "string" && storage.dir.trim().length > 0
     ? storage.dir
-    : "~/.zcode";
+    : `~/${PRODUCT_DATA_DIR_NAME}`;
 }
 
 function readPluginConfigFromConfig(config: Record<string, unknown>): PluginConfigSummary {

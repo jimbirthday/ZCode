@@ -4,7 +4,7 @@ import type { IServiceAccessor } from "@zcode/services";
 import type { ZCodeWorkspaceEvent } from "@zcode/shared";
 import { logger } from "@/logger.js";
 import { useBaseWorkspaceServices } from "@/hooks/useWorkspaceServices.js";
-import { useZCodeSessionStore, selectWorkspaceZCodeState } from "@/store/zcodeSessionStore.js";
+import { useZCodeSessionStore, selectWorkspaceZCodeState } from "@/store/mgcodeSessionStore.js";
 import type { WorkspaceTabState } from "@/store/tabStore.js";
 import {
   buildTaskEntityKey,

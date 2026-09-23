@@ -10,7 +10,7 @@ import type {
   ZCodeStreamEvent,
   ZCodeUsage,
 } from "@zcode/shared";
-import type { ConversationTelemetryFact } from "@zcode/shared/zcode-protocol-v4";
+import type { ConversationTelemetryFact } from "@zcode/shared/mgcode-protocol-v4";
 import { reportAppTelemetryEvent } from "@/lib/appTelemetry.js";
 import {
   reportChatErrorBannerTelemetry,
@@ -57,7 +57,7 @@ import {
   reportUiToolCallDetail,
   reportUiTurnBreakdown,
 } from "@/lib/uiPerfArmsTelemetry.js";
-import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
+import type { ZCodeUiError } from "@/lib/mgcodeUiError.js";
 import { resolveLegacyRuntimeModelValue } from "@/v4/telemetry/conversationPromptTelemetry.js";
 
 const MAX_DEDUPE_KEYS = 2_000;

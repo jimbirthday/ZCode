@@ -14,7 +14,7 @@ import {
   resolveStableTransportCodeAttribution,
   resolveTrustedProviderCodeFailureReason,
 } from "@/lib/chatErrorAttributionEvidence.js";
-import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
+import type { ZCodeUiError } from "@/lib/mgcodeUiError.js";
 
 const UNKNOWN_FAILURE_REASON = "unknown";
 

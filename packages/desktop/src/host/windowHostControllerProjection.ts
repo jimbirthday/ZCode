@@ -14,7 +14,7 @@ import {
   type WindowHostControllerWorkspaceFact,
   type WindowHostControllerWorkspaceFrame,
   type WindowHostTaskAddress,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 
 export type WindowHostControllerSourceScope =
   | {

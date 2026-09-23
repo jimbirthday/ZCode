@@ -14,18 +14,18 @@ import type {
   ZCodeProvider,
   ZCodeSlashCommand,
 } from "@zcode/shared";
-import type { SessionConfigState } from "@zcode/shared/zcode-protocol-v4";
+import type { SessionConfigState } from "@zcode/shared/mgcode-protocol-v4";
 import type { IModelSelectionService } from "@zcode/services";
 import { completeNewModelSelection } from "@zcode/provider";
 import {
   useModelSelectionServiceView,
   type ModelSelectionRead,
 } from "@/hooks/useModelSelectionView.js";
-import { submissionModeSchema } from "@zcode/shared/zcode-protocol-v4";
+import { submissionModeSchema } from "@zcode/shared/mgcode-protocol-v4";
 import { prepareWorkspaceWithZCodeSessionService } from "@/hooks/useWorkspacePrepare.js";
-import { useZCodeSessionService } from "@/hooks/useZCodeSessionService.js";
+import { useZCodeSessionService } from "@/hooks/useMgcodeSessionService.js";
 import { useSettings } from "@/hooks/useSettingService.js";
-import { parseModelPickerValue } from "@/lib/zcodeSessionProjection.js";
+import { parseModelPickerValue } from "@/lib/mgcodeSessionProjection.js";
 import { initializeNewTaskDraft } from "@/v4/composer/newTaskDraft.js";
 import {
   clearV4ComposerDraft,
@@ -36,7 +36,7 @@ import {
 } from "@/v4/composer/composerDraftStore.js";
 import { resolveAppFollowupMode } from "@/v4/composer/followupModeSettings.js";
 import { logger } from "@/logger.js";
-import { useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
+import { useZCodeSessionStore } from "@/store/mgcodeSessionStore.js";
 
 /** 目录水合单飞（per workspaceKey）：draft、已有 session 和严格模式双挂载共享一次 RPC。 */
 const workspaceCatalogHydrationFlights = new Map<string, Promise<void>>();

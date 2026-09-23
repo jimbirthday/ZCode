@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { CuaAccessibilitySettingsResult, CuaPermissionKind } from "@zcode/shared";
-import { requiredCuaPermissionsForRequestAccessStatus } from "@zcode/shared/zcode-protocol-v4";
+import { requiredCuaPermissionsForRequestAccessStatus } from "@zcode/shared/mgcode-protocol-v4";
 import {
   isCuaPermissionStatusAvailable,
   type CuaPermissionRestartOptions,

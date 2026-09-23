@@ -65,7 +65,7 @@ import { fetchBigModelSubscriptionSummary } from "./bigmodelSubscriptionProvider
 import {
   fetchMcpQuotaSnapshot,
   type OfficialMcpCredentialSource,
-} from "./zcodeMcpQuotaProvider.js";
+} from "./mgcodeMcpQuotaProvider.js";
 import type { BigModelUsageQuotaEnvelope } from "./bigmodelUsageQuotaMapper.js";
 import { normalizeLimits, pickPrimaryLimit } from "./bigmodelUsageQuotaMapper.js";
 

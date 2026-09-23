@@ -4,7 +4,7 @@ import {
   type ZCodeProvider,
   type ZCodeError,
 } from "@zcode/shared";
-import { normalizeZCodeUiError } from "@/lib/zcodeUiError.js";
+import { normalizeZCodeUiError } from "@/lib/mgcodeUiError.js";
 
 export const MODEL_CONFIG_MISSING_UI_ERROR_CODE = "model_config_missing";
 

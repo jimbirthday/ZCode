@@ -20,7 +20,7 @@ import {
   TID_V4_QUEUE_RESUME,
   testId,
 } from "@zcode/shared";
-import type { QueueState } from "@zcode/shared/zcode-protocol-v4";
+import type { QueueState } from "@zcode/shared/mgcode-protocol-v4";
 import { ArrowUpFromLine, GripVertical, PencilIcon, Trash2Icon } from "lucide-react";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { Button } from "@/components/ui/button.js";

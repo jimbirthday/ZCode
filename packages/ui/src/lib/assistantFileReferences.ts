@@ -8,7 +8,7 @@ import { MEDIA_PREVIEW_FORMATS } from "@zcode/shared";
 import {
   extractZCodeFileCitationDirectives,
   resolveZCodeFileCitationPreviewKind,
-} from "@/lib/zcodeFileCitation.js";
+} from "@/lib/mgcodeFileCitation.js";
 import {
   isBalancedAssistantPathQuotePair,
   isAssistantPathQuoteCharacter,

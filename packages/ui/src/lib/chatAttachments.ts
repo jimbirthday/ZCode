@@ -5,7 +5,7 @@ import {
   type CreateTempTextAttachmentResult,
   type ZCodePromptAttachment,
 } from "@zcode/shared";
-import { PROTOCOL_V4_LIMITS } from "@zcode/shared/zcode-protocol-v4";
+import { PROTOCOL_V4_LIMITS } from "@zcode/shared/mgcode-protocol-v4";
 import {
   OversizedInlineImageAttachmentError,
   OversizedInlinePdfAttachmentError,

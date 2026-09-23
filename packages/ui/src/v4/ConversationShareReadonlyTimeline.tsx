@@ -34,7 +34,7 @@ import type {
   TimelineMarkerRow,
   ToolCallRow,
   UserInputRow,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { MessageResponse, type MessageFileLinkTarget } from "@/components/ai-elements/message.js";
 import {
   Reasoning,

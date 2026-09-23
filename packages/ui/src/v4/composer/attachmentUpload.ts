@@ -12,7 +12,7 @@ import type {
   AttachmentRef,
   V4AttachmentPutParams,
   V4AttachmentPutResult,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import { logger } from "@/logger.js";
 import type { AttachmentUploadOptions } from "@/v4/attachmentUploadTransaction.js";
 

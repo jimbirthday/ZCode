@@ -1,6 +1,6 @@
 import { ZCODE_AGENT_PROVIDER, type PlanIdentitySnapshot, type ZCodeProvider } from "@zcode/shared";
 import { buildPromptTelemetryExtraDetail } from "@/lib/messageTelemetry.js";
-import { encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
+import { encodeCustomModelValue } from "@/lib/mgcodeCustomModelValue.js";
 import {
   legacyTelemetryModelValue,
   legacyTelemetryProviderId,

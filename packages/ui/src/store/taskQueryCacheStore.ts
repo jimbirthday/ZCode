@@ -2,8 +2,8 @@
 import { create } from "zustand";
 import type { ZCodeTaskListItem } from "@zcode/services";
 import type { ZCodeTaskMeta } from "@zcode/shared";
-import { matchesTaskListMembershipKind } from "@zcode/shared/zcode-protocol-v4";
-import { mergeTaskMetaCandidates } from "@/lib/zcodeTaskMetaMerge.js";
+import { matchesTaskListMembershipKind } from "@zcode/shared/mgcode-protocol-v4";
+import { mergeTaskMetaCandidates } from "@/lib/mgcodeTaskMetaMerge.js";
 import { compareZCodeTaskListItems } from "@/lib/taskListOrdering.js";
 import { getTaskListRowActivity, mergeTaskListMembershipFields } from "@/v4/taskListRowActivity.js";
 import {

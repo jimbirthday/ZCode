@@ -32,7 +32,7 @@ import {
   type V4ConversationRowsRangeResult,
   type V4ConversationSubscribeResult,
   type V4ConversationResyncResult,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 import type { ConversationTransport } from "@/v4/transport.js";
 import { ensureAgentV4ConnectionHandshake } from "@/v4/agentV4ConnectionHandshake.js";
 import { createWorkflowRunTransportMethods } from "@/v4/agentConversationTransportWorkflowRuns.js";

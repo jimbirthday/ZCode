@@ -18,7 +18,7 @@ const useBootstrapWithRemoteBuild = process.env.ZCODE_BOOTSTRAP_WITH_REMOTE === 
 const pnpmRunEnv = {
   ...process.env,
   ZCODE_ENV: await resolveBuiltinProviderBuildEnvironment({ root: repoRoot }),
-  // pnpm 11 的 verify-deps-before-run 会在 apps/zcode-cli 子 workspace
+  // pnpm 11 的 verify-deps-before-run 会在 apps/mgcode-cli/zcode-cli 子 workspace
   // 执行每个 run 前触发 pnpm install；子 workspace 运行时依赖根仓库 @zcode/shared，
   // 自动 install 无法解析根 workspace 包，导致 dev:desktop:test 和 E2E onPrepare 失败。
   PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false",
@@ -68,7 +68,7 @@ const defaultBuildFilters = [
 
 async function verifyRequiredDevPluginRuntimeArtifacts() {
   for (const runtime of requiredDevPluginRuntimeBuilds) {
-    const artifactPath = resolve(repoRoot, "apps/zcode-cli/packages", runtime.artifactPath);
+    const artifactPath = resolve(repoRoot, "apps/mgcode-cli/zcode-cli/packages", runtime.artifactPath);
     try {
       await access(artifactPath);
     } catch (error) {
@@ -99,11 +99,11 @@ function stageDevAgentBundle() {
 }
 
 async function runBootstrapWithRemoteBuild() {
-  if (existsSync(resolve(repoRoot, "apps/zcode-cli/packages/cli/dist/zcode.cjs"))) {
+  if (existsSync(resolve(repoRoot, "apps/mgcode-cli/zcode-cli/packages/cli/dist/zcode.cjs"))) {
     await stageBuiltinProviderConfig({
       root: repoRoot,
       env: pnpmRunEnv,
-      directory: resolve(repoRoot, "apps/zcode-cli/packages/cli/dist/provider"),
+      directory: resolve(repoRoot, "apps/mgcode-cli/zcode-cli/packages/cli/dist/provider"),
     });
     console.log("[build-desktop-agent-cli] reuse existing zcode-cli desktop agent bundle");
     return;
@@ -117,20 +117,20 @@ async function runBootstrapWithRemoteBuild() {
     // 必须先手动跑生成脚本补齐 gitignored 的 libs.generated.ts，否则 tsc 因缺文件报错。
     if (prepareScript) {
       runCommand(process.execPath, [prepareScript], {
-        cwd: `apps/zcode-cli/packages/${packageDir}`,
+        cwd: `apps/mgcode-cli/zcode-cli/packages/${packageDir}`,
         env: pnpmRunEnv,
         stdio: "inherit",
       });
     }
     runCommand(process.execPath, ["../../node_modules/typescript/bin/tsc"], {
-      cwd: `apps/zcode-cli/packages/${packageDir}`,
+      cwd: `apps/mgcode-cli/zcode-cli/packages/${packageDir}`,
       env: pnpmRunEnv,
       stdio: "inherit",
     });
   }
 
   runCommand(process.execPath, ["scripts/build.mjs", "--desktop-agent"], {
-    cwd: "apps/zcode-cli/packages/cli",
+    cwd: "apps/mgcode-cli/zcode-cli/packages/cli",
     env: pnpmRunEnv,
     stdio: "inherit",
   });
@@ -143,8 +143,8 @@ if (useBootstrapWithRemoteBuild) {
 }
 
 if (!useTurboBuild) {
-  // Linux 容器 demo 里没有仓库级 turbo 根，`turbo --cwd apps/zcode-cli`
-  // 会把 apps/zcode-cli 当根目录，并拒绝 turbo.json 中指向 ../../packages/shared 的 inputs。
+  // Linux 容器 demo 里没有仓库级 turbo 根，`turbo --cwd apps/mgcode-cli/zcode-cli`
+  // 会把 apps/mgcode-cli/zcode-cli 当根目录，并拒绝 turbo.json 中指向 ../../packages/shared 的 inputs。
   // 同时 agent 子 workspace 不包含根 packages/shared，但 agent 包依赖 @zcode/shared。
   // 因此默认改用仓库根 workspace 的明确 pnpm 包顺序构建，避免 WDIO 前置构建卡在子 workspace 解析。
   for (const filter of defaultBuildFilters) {
@@ -170,7 +170,7 @@ runCommand(
     "turbo",
     "--skip-infer",
     "--cwd",
-    "apps/zcode-cli",
+    "apps/mgcode-cli/zcode-cli",
     "run",
     "build:desktop-agent",
     "--filter=@zcode/cli",

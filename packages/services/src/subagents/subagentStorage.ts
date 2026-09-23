@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
+import { PRODUCT_DATA_DIR_NAME } from "@zcode/shared/product-data-dir";
 
 const HOME_PREFIX = "~/";
 
@@ -21,7 +22,7 @@ export async function resolveUserSubagentRoot(options?: SubagentStorageOptions):
 }
 
 export function resolveWorkspaceSubagentRoot(workspacePath: string): string {
-  return join(workspacePath, ".zcode", "agents");
+  return join(workspacePath, ".mgcode", "agents");
 }
 
 export async function resolveSubagentStateFile(options?: SubagentStorageOptions): Promise<string> {
@@ -34,7 +35,7 @@ export async function resolveZCodeStorageRoot(options?: SubagentStorageOptions):
   const storageDir =
     typeof storage.dir === "string" && storage.dir.trim().length > 0
       ? storage.dir.trim()
-      : "~/.zcode";
+      : `~/${PRODUCT_DATA_DIR_NAME}`;
   return resolveConfigPath(storageDir, options);
 }
 
@@ -50,7 +51,7 @@ async function readUserCliConfig(
 ): Promise<Record<string, unknown>> {
   try {
     const raw = await readFile(
-      join(resolveUserHomeDir(options), ".zcode", "cli", "config.json"),
+      join(resolveUserHomeDir(options), ".mgcode", "cli", "config.json"),
       "utf8",
     );
     const parsed = JSON.parse(raw) as unknown;

@@ -1,6 +1,6 @@
 import type { ZCodeTaskRuntimeStatus } from "@zcode/shared";
-import { getWorkspaceDisplayedTaskState } from "@/store/zcodeSessionStore.js";
-import type { ZCodeSessionStoreState, WorkspaceZCodeUIState } from "@/store/zcodeSessionStore.js";
+import { getWorkspaceDisplayedTaskState } from "@/store/mgcodeSessionStore.js";
+import type { ZCodeSessionStoreState, WorkspaceZCodeUIState } from "@/store/mgcodeSessionStore.js";
 
 interface RemoteWorkspaceRuntimeTab {
   workspacePath: string;

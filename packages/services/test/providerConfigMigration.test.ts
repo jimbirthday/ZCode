@@ -5,7 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { createProviderConfigRuntime } from "../src/model-provider/providerConfigRuntime.js";
-import { readLegacyZCodeConfigProviders } from "../src/model-provider/legacyZCodeConfigProviderReader.js";
+import { readLegacyZCodeConfigProviders } from "../src/model-provider/legacyMgcodeConfigProviderReader.js";
 import { getAppConfigDir, setDataBaseDir } from "../src/paths.js";
 
 const legacyConfig = {

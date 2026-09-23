@@ -8,7 +8,7 @@ import type {
   PendingInteraction,
   PermissionRequestPayload,
   UserInputRequestPayload,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@zcode/shared/mgcode-protocol-v4";
 
 const LEGACY_PERMISSION_RULE_INPUT_KEYS = [
   "command",

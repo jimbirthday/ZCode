@@ -12,7 +12,7 @@ import { REMOTE_ASSET_INSTALL_MODES } from "./remoteAssetInstallMode.js";
 import { PROCESS_RESOURCE_CLI_LANES } from "./processResourceTelemetry.js";
 import { isKnownRemoteResourcePackageId } from "./remoteResourcePackages.js";
 import { zcodeProviderSchema } from "./providers.js";
-import { zcodeAgentProviderSchema } from "./zcode-agent-policy.js";
+import { zcodeAgentProviderSchema } from "./mgcode-agent-policy.js";
 import { modelSelectionSchema } from "./model-selection.js";
 import { providerProvisioningTriggerSchema } from "./provider-provisioning.js";
 import {
@@ -20,11 +20,11 @@ import {
   zcodeMcpResourceSamplesSchema,
   zcodeToolExecResourceSchema,
   zcodeProcessResourceSampleSchema,
-} from "./zcode-protocol/index.js";
-import { zcodeTaskModeSchema } from "./zcode-task-mode-schema.js";
-import { PROTOCOL_V4_LIMITS } from "./zcode-protocol-v4/core.js";
-import { errorAttributionSchema } from "./zcode-protocol-v4/snapshot.js";
-import { sessionWorkflowActivitySchema } from "./zcode-protocol-v4/sessions-index-workflow-activity.js";
+} from "./mgcode-protocol/index.js";
+import { zcodeTaskModeSchema } from "./mgcode-task-mode-schema.js";
+import { PROTOCOL_V4_LIMITS } from "./mgcode-protocol-v4/core.js";
+import { errorAttributionSchema } from "./mgcode-protocol-v4/snapshot.js";
+import { sessionWorkflowActivitySchema } from "./mgcode-protocol-v4/sessions-index-workflow-activity.js";
 import {
   taskOwnerCommandDeliverySchema,
   taskOwnerCommandRequestSchema,
@@ -40,7 +40,7 @@ import {
 } from "./task-realtime-core.js";
 
 export { WSL_USER_MAX_LENGTH, isValidWslUser, wslUserSchema } from "./wslUserValidation.js";
-export { zcodeTaskModeSchema } from "./zcode-task-mode-schema.js";
+export { zcodeTaskModeSchema } from "./mgcode-task-mode-schema.js";
 import { wslUserSchema } from "./wslUserValidation.js";
 export {
   appSettingsOccupationEnum,
