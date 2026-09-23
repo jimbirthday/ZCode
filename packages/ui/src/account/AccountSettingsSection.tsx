@@ -18,20 +18,21 @@ import { SettingsGroupCard, SettingsRow } from "@/settings/SettingsPageParts.js"
 import { useZCodeStore } from "@/store/StoreProvider.js";
 import { AccountLoginForm } from "./AccountLoginForm.js";
 import {
+  accountPageFetch,
   loadPaymentMethods,
   loadSharedAccountBilling,
+  paymentLaunchUrl,
   persistSyncedMgooleCredential,
   readBrowserAccountSession,
+  userInfoFromAccountSession,
   readSyncedKeyId,
   startBalanceRecharge,
-  startSharedPlanPurchase,
   syncMgooleModelCredential,
   writeBrowserAccountSession,
   writeSyncedKeyId,
   type AccountBillingView,
   type AccountSession,
   type PaymentMethodOption,
-  type PaymentOrderStart,
 } from "./mgooleAccount.js";
 
 const EMPTY_VIEW: AccountBillingView = {
@@ -46,22 +47,22 @@ export function AccountSettingsSection() {
   const platform = usePlatform();
   const { providerSettingsService, modelSelectionService } = useServices();
   const markApiKeyLoginSuccess = useZCodeStore((state) => state.markApiKeyLoginSuccess);
+  const setUser = useZCodeStore((state) => state.setUser);
   const [session, setSession] = useState<AccountSession | null>(() => readBrowserAccountSession());
   const [view, setView] = useState<AccountBillingView>(EMPTY_VIEW);
   const [methods, setMethods] = useState<PaymentMethodOption[]>([]);
   const [paymentType, setPaymentType] = useState("");
   const [amount, setAmount] = useState("10");
-  const [order, setOrder] = useState<PaymentOrderStart | null>(null);
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async (current: AccountSession) => {
     setLoading(true);
     try {
       const [billing, paymentMethods, credential] = await Promise.all([
-        loadSharedAccountBilling({ fetchImpl: fetch, session: current }),
-        loadPaymentMethods({ fetchImpl: fetch, session: current }),
+        loadSharedAccountBilling({ fetchImpl: accountPageFetch, session: current }),
+        loadPaymentMethods({ fetchImpl: accountPageFetch, session: current }),
         syncMgooleModelCredential({
-          fetchImpl: fetch,
+          fetchImpl: accountPageFetch,
           session: current,
           previousKeyId: readSyncedKeyId(),
         }),
@@ -122,6 +123,10 @@ export function AccountSettingsSection() {
   }, [markApiKeyLoginSuccess, modelSelectionService, providerSettingsService]);
 
   useEffect(() => {
+    if (session) setUser(userInfoFromAccountSession(session));
+  }, [session, setUser]);
+
+  useEffect(() => {
     if (session) void refresh(session);
   }, [refresh, session]);
 
@@ -131,29 +136,19 @@ export function AccountSettingsSection() {
     if (!Number.isFinite(parsed) || parsed <= 0) return;
     try {
       const created = await startBalanceRecharge({
-        fetchImpl: fetch,
+        fetchImpl: accountPageFetch,
         session,
         amount: parsed,
         paymentType,
       });
-      setOrder(created);
-    } catch (error) {
-      toast(error instanceof Error ? error.message : String(error), { variant: "warning" });
-    }
-  };
-
-  const buyPlan = async (planId: number, price: number, renewSubscriptionId?: number) => {
-    if (!session || !paymentType) return;
-    try {
-      const created = await startSharedPlanPurchase({
-        fetchImpl: fetch,
-        session,
-        planId,
-        amount: price,
-        paymentType,
-        renewSubscriptionId,
-      });
-      setOrder(created);
+      const url = paymentLaunchUrl(created);
+      if (url) platform.openExternal(url);
+      else {
+        toast(
+          intl.formatMessage({ id: "settings.account.orderOpened" }, { orderId: created.orderId }),
+          { variant: "warning" },
+        );
+      }
     } catch (error) {
       toast(error instanceof Error ? error.message : String(error), { variant: "warning" });
     }
@@ -216,85 +211,6 @@ export function AccountSettingsSection() {
             </div>
           }
         />
-        {order ? (
-          <SettingsRow
-            label={intl.formatMessage({ id: "settings.account.order" })}
-            description={order.orderType === "shared_subscription" ? order.outTradeNo : order.outTradeNo}
-            control={
-              <span className="text-ui-base text-foreground" data-testid="account-order-id">
-                {order.orderId}
-              </span>
-            }
-            detail={
-              order.payUrl ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={() => platform.openExternal(order.payUrl)}
-                >
-                  {intl.formatMessage({ id: "settings.account.openPayUrl" })}
-                </Button>
-              ) : null
-            }
-          />
-        ) : null}
-      </SettingsGroupCard>
-      <SettingsGroupCard>
-        <div className="border-b border-border px-4 py-3 text-ui-base font-medium text-foreground">
-          {intl.formatMessage({ id: "settings.account.sharedTitle" })}
-          {view.entitlements.length === 0 && view.plans.length === 0 ? (
-            <div className="mt-1 font-normal text-foreground-subtle">
-              {intl.formatMessage({ id: "settings.account.sharedEmpty" })}
-            </div>
-          ) : null}
-        </div>
-        {view.entitlements.map((item) => (
-          <SettingsRow
-            key={item.id}
-            label={item.name}
-            description={intl.formatMessage(
-              { id: "settings.account.sharedEntitlement" },
-              {
-                status: item.status,
-                days: item.validityDays,
-                expires: item.expiresAt,
-                price: item.price,
-              },
-            )}
-            control={
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                data-testid="account-shared-renew"
-                onClick={() => void buyPlan(item.planId, item.price, item.id)}
-              >
-                {intl.formatMessage({ id: "settings.account.renew" })}
-              </Button>
-            }
-          />
-        ))}
-        {view.plans.map((plan) => (
-          <SettingsRow
-            key={plan.id}
-            label={plan.name}
-            description={intl.formatMessage(
-              { id: "settings.account.sharedPlan" },
-              { days: plan.validityDays, price: plan.price },
-            )}
-            control={
-              <Button
-                type="button"
-                size="lg"
-                data-testid="account-shared-buy"
-                onClick={() => void buyPlan(plan.id, plan.price)}
-              >
-                {intl.formatMessage({ id: "settings.account.buy" })}
-              </Button>
-            }
-          />
-        ))}
       </SettingsGroupCard>
       <Button
         type="button"
@@ -302,9 +218,10 @@ export function AccountSettingsSection() {
         size="lg"
         onClick={() => {
           writeBrowserAccountSession(null);
+          writeSyncedKeyId(null);
+          setUser(null);
           setSession(null);
           setView(EMPTY_VIEW);
-          setOrder(null);
         }}
       >
         {intl.formatMessage({ id: "settings.account.logout" })}

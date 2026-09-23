@@ -11,12 +11,14 @@ import { buildLoginApiKeyDefaultModelPreferenceFromSelection } from "@/login/Log
 import { useZCodeStore } from "@/store/StoreProvider.js";
 import {
   completeMgooleLogin2FA,
+  accountPageFetch,
   loadPublicLoginSettings,
   loginMgooleAccount,
   persistSyncedMgooleCredential,
   readSyncedKeyId,
   sessionFromLoginResult,
   syncMgooleModelCredential,
+  userInfoFromAccountSession,
   writeBrowserAccountSession,
   writeSyncedKeyId,
   type PublicLoginSettings,
@@ -39,6 +41,7 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
   const { intl } = useZCodeIntl();
   const { providerSettingsService, modelSelectionService } = useServices();
   const markApiKeyLoginSuccess = useZCodeStore((state) => state.markApiKeyLoginSuccess);
+  const setUser = useZCodeStore((state) => state.setUser);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -52,7 +55,7 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
 
   useEffect(() => {
     let cancelled = false;
-    void loadPublicLoginSettings({ fetchImpl: fetch })
+    void loadPublicLoginSettings({ fetchImpl: accountPageFetch })
       .then((next) => {
         if (!cancelled) setSettings(next);
       })
@@ -79,7 +82,7 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
     });
     if (!session) return;
     const credential = await syncMgooleModelCredential({
-      fetchImpl: fetch,
+      fetchImpl: accountPageFetch,
       session,
       previousKeyId: readSyncedKeyId(),
     });
@@ -134,7 +137,7 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
     setError(null);
     try {
       const result = await loginMgooleAccount({
-        fetchImpl: fetch,
+        fetchImpl: accountPageFetch,
         email,
         password,
         captcha: {
@@ -152,7 +155,12 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
         return;
       }
       writeBrowserAccountSession(result.session);
-      await applySyncedKey(result.session.accessToken);
+      setUser(userInfoFromAccountSession(result.session));
+      try {
+        await applySyncedKey(result.session.accessToken);
+      } catch (syncError) {
+        logger.warn("[AccountLogin] 同步芒果AI密钥失败", { error: syncError });
+      }
       await onLoggedIn();
     } catch (loginError) {
       logger.error("[AccountLogin] 登录失败", { error: loginError });
@@ -168,7 +176,7 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
     setError(null);
     try {
       const result = await completeMgooleLogin2FA({
-        fetchImpl: fetch,
+        fetchImpl: accountPageFetch,
         tempToken,
         totpCode,
       });
@@ -178,7 +186,12 @@ export function AccountLoginForm({ onUseApiKey, onLoggedIn }: AccountLoginFormPr
         return;
       }
       writeBrowserAccountSession(session);
-      await applySyncedKey(session.accessToken);
+      setUser(userInfoFromAccountSession(session));
+      try {
+        await applySyncedKey(session.accessToken);
+      } catch (syncError) {
+        logger.warn("[AccountLogin] 同步芒果AI密钥失败", { error: syncError });
+      }
       await onLoggedIn();
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : String(loginError));

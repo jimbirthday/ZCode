@@ -14,6 +14,7 @@ interface ModelProviderSectionLayoutProps {
   onRefresh: () => void;
   addProviderLabel: string;
   onAddProvider: () => void;
+  headerExtra?: ReactNode;
   navigationGroups: ModelProviderNavGroup[];
   selectedNodeKey: string | null;
   onSelectNavItem: (item: ModelProviderNavGroup["items"][number]) => void;
@@ -38,6 +39,7 @@ export function ModelProviderSectionLayout({
   onRefresh,
   addProviderLabel,
   onAddProvider,
+  headerExtra,
   navigationGroups,
   selectedNodeKey,
   onSelectNavItem,
@@ -54,7 +56,9 @@ export function ModelProviderSectionLayout({
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <p className="text-ui-base leading-6 text-foreground-subtle">{description}</p>
-        <SettingsResourceHeaderActions
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          {headerExtra}
+          <SettingsResourceHeaderActions
           onRefresh={onRefresh}
           onNew={onAddProvider}
           refreshing={refreshButtonLoading}
@@ -62,6 +66,7 @@ export function ModelProviderSectionLayout({
           newLabel={addProviderLabel}
           newTestId={TID_MODEL_PROVIDER_ADD_PROVIDER_BUTTON}
         />
+        </div>
       </div>
 
       <div className="overflow-clip rounded-xl border border-border bg-card">

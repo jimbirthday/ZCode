@@ -55,7 +55,7 @@ import {
 } from "@/lib/accountProviderAccess.js";
 import { buildUsageEntitlementCacheKey } from "@/lib/usageEntitlementCache.js";
 import { ModelProviderSection } from "@/settings/ModelProviderSection.js";
-import { useCodingPlanUpgradeDialog } from "@/settings/CodingPlanUpgradeDialogProvider.js";
+
 import { useEnterpriseCodingPlanProducts } from "@/settings/model-provider-section/useEnterpriseCodingPlanProducts.js";
 import { UsageStatsSection, type UsageStatsSectionTab } from "@/settings/UsageStatsSection.js";
 import {
@@ -71,6 +71,7 @@ import { HooksSection } from "@/settings/HooksSection.js";
 import { PromptProfilesSection } from "@/settings/PromptProfilesSection.js";
 import { WorkspaceFileSearchSection } from "@/settings/WorkspaceFileSearchSection.js";
 import { AccountSettingsSection } from "@/account/AccountSettingsSection.js";
+import { SubscriptionSettingsSection } from "@/account/SubscriptionSettingsSection.js";
 import { MemorySettingsSection } from "@/settings/MemorySettingsSection.js";
 import { BrowserSettingsSection } from "@/settings/BrowserSettingsSection.js";
 import { ComputerUseSection } from "@/settings/ComputerUseSection.js";
@@ -552,7 +553,6 @@ export function SettingsPage({
     usageBigmodelEnterpriseProducts.loading ||
     usageZaiEnterpriseProducts.loading;
   const [initialModelProviderTarget] = useState(() => consumePendingSettingsModelProviderTarget());
-  const { openCodingPlanUpgrade } = useCodingPlanUpgradeDialog();
   const [pendingModelProviderTarget, setPendingModelProviderTarget] = useState<
     SettingsModelProviderTarget | undefined
   >(() => initialModelProviderTarget);
@@ -601,18 +601,9 @@ export function SettingsPage({
     },
     [activeSection],
   );
-  const handleOpenCodingPlanUpgradeSettings = useCallback(
-    (
-      providerId: string,
-      funnelContext?: import("@/lib/codingPlanFunnelTelemetry.js").CodingPlanFunnelContext,
-    ) => {
-      openCodingPlanUpgrade({
-        providerId,
-        funnelContext,
-      });
-    },
-    [openCodingPlanUpgrade],
-  );
+  const handleOpenCodingPlanUpgradeSettings = useCallback(() => {
+    setActiveSettingsSection("subscription");
+  }, [setActiveSettingsSection]);
   const handleOpenModelProviderSettings = useCallback(() => {
     setActiveSettingsSection("modelProvider");
   }, [setActiveSettingsSection]);
@@ -1650,6 +1641,10 @@ export function SettingsPage({
                         {activeSection === "account" ? (
                           <ServiceProvider services={localHostServices}>
                             <AccountSettingsSection />
+                          </ServiceProvider>
+                        ) : activeSection === "subscription" ? (
+                          <ServiceProvider services={localHostServices}>
+                            <SubscriptionSettingsSection />
                           </ServiceProvider>
                         ) : activeSection === "general" ? (
                           <GeneralSectionContent

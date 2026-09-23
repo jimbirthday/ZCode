@@ -3,7 +3,7 @@ import {
   asRecord,
   asString,
   getJson,
-  MGOOLE_ACCOUNT_API_BASE,
+  resolveAccountApiBase,
   type AccountApiKey,
   type AccountSession,
   type FetchLike,
@@ -24,6 +24,7 @@ function normalizeApiKey(value: unknown): AccountApiKey | null {
   if (!record) return null;
   const id = asNumber(record.id);
   if (id === null) return null;
+  const group = asRecord(record.group);
   return {
     id,
     key: asString(record.key),
@@ -31,7 +32,55 @@ function normalizeApiKey(value: unknown): AccountApiKey | null {
     status: asString(record.status),
     expiresAt: typeof record.expires_at === "string" ? record.expires_at : null,
     updatedAt: asString(record.updated_at),
+    groupId: asNumber(record.group_id),
+    groupName: asString(group?.name),
   };
+}
+
+export interface PlannedGroupSync {
+  groupKey: string;
+  providerName: string;
+  apiKey: string;
+  syncedKeyId: string;
+  modelId: string;
+}
+
+export function planGroupKeySync(keys: readonly AccountApiKey[], now = Date.now()): PlannedGroupSync[] {
+  const chosen = new Map<string, AccountApiKey>();
+  for (const key of keys) {
+    if (!isUsableAccountApiKey(key, now)) continue;
+    const groupKey = key.groupId !== null ? `group:${key.groupId}` : `key:${key.id}`;
+    const current = chosen.get(groupKey);
+    if (!current || Date.parse(key.updatedAt) >= Date.parse(current.updatedAt)) {
+      chosen.set(groupKey, key);
+    }
+  }
+  return [...chosen.entries()].map(([groupKey, key]) => {
+    const providerName = key.groupName.trim() || key.name.trim() || `key-${key.id}`;
+    return {
+      groupKey,
+      providerName,
+      apiKey: key.key,
+      syncedKeyId: String(key.id),
+      modelId: providerName,
+    };
+  });
+}
+
+export function resolveAccountOpenAiBaseUrl(explicit?: string): string {
+  return `${resolveAccountApiBase(explicit).replace(/\/api\/v1\/?$/, "")}/v1`;
+}
+
+export function modelIdsFromModelsPayload(payload: unknown): string[] {
+  const record = asRecord(payload);
+  const data = record && "data" in record ? record.data : payload;
+  const nested = asRecord(data);
+  const list = Array.isArray(data) ? data : Array.isArray(nested?.data) ? nested.data : [];
+  return list.flatMap((item) => {
+    if (typeof item === "string" && item.trim()) return [item.trim()];
+    const id = asString(asRecord(item)?.id).trim();
+    return id ? [id] : [];
+  });
 }
 
 export function selectMgooleModelCredential(input: {
@@ -75,14 +124,12 @@ function keysFromPayload(payload: unknown): AccountApiKey[] {
   });
 }
 
-export async function syncMgooleModelCredential(input: {
+export async function listAccountApiKeys(input: {
   fetchImpl: FetchLike;
   session: AccountSession;
-  previousKeyId?: string | null;
-  now?: number;
   baseUrl?: string;
-}): Promise<MgooleModelCredential | null> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+}): Promise<AccountApiKey[]> {
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   const keys: AccountApiKey[] = [];
   let page = 1;
   let pages = 1;
@@ -96,7 +143,18 @@ export async function syncMgooleModelCredential(input: {
     const record = asRecord(payload);
     pages = asNumber(record?.pages) ?? 1;
     page += 1;
-  } while (page <= pages);
+  } while (page <= pages && page <= 20);
+  return keys;
+}
+
+export async function syncMgooleModelCredential(input: {
+  fetchImpl: FetchLike;
+  session: AccountSession;
+  previousKeyId?: string | null;
+  now?: number;
+  baseUrl?: string;
+}): Promise<MgooleModelCredential | null> {
+  const keys = await listAccountApiKeys(input);
   return selectMgooleModelCredential({
     keys,
     previousKeyId: input.previousKeyId,

@@ -6,7 +6,7 @@ import {
   postJson,
   readJson,
   unwrapData,
-  MGOOLE_ACCOUNT_API_BASE,
+  resolveAccountApiBase,
   type AccountBillingView,
   type AccountSession,
   type FetchLike,
@@ -15,6 +15,8 @@ import {
   type PublicLoginSettings,
   type SharedEntitlement,
   type SharedPlanOffer,
+  type SharedQuotaKind,
+  type SharedQuotaWindow,
 } from "./mgooleAccount.js";
 
 function isSharedPlanRecord(value: unknown): value is Record<string, unknown> {
@@ -32,6 +34,30 @@ function isSharedSubscriptionRecord(value: unknown): boolean {
   return isSharedPlanRecord(record.plan);
 }
 
+function groupNamesFrom(value: unknown): string[] {
+  const record = asRecord(value);
+  if (!record) return [];
+  return Object.values(record).flatMap((item) => {
+    if (typeof item !== "string") return [];
+    const name = item.trim();
+    return name ? [name] : [];
+  });
+}
+
+function toQuotaWindow(value: unknown): SharedQuotaWindow | null {
+  const record = asRecord(value);
+  if (!record) return null;
+  const kind = asString(record.kind);
+  if (kind !== "daily" && kind !== "weekly" && kind !== "monthly") return null;
+  return {
+    kind,
+    limit: asNumber(record.limit),
+    used: asNumber(record.used) ?? 0,
+    reserved: asNumber(record.reserved) ?? 0,
+    resetsAt: asString(record.resets_at),
+  };
+}
+
 function toPlanOffer(value: Record<string, unknown>): SharedPlanOffer | null {
   const id = asNumber(value.id);
   const validityDays = asNumber(value.validity_days);
@@ -40,9 +66,14 @@ function toPlanOffer(value: Record<string, unknown>): SharedPlanOffer | null {
   return {
     id,
     name: asString(value.name),
+    description: asString(value.description),
     price,
     validityDays,
     forSale: value.for_sale !== false,
+    groupNames: groupNamesFrom(value.group_names),
+    dailyLimit: asNumber(value.daily_limit_usd),
+    weeklyLimit: asNumber(value.weekly_limit_usd),
+    monthlyLimit: asNumber(value.monthly_limit_usd),
   };
 }
 
@@ -52,15 +83,74 @@ function toEntitlement(value: Record<string, unknown>): SharedEntitlement | null
   const offer = toPlanOffer(plan);
   const id = asNumber(value.id);
   if (!offer || id === null) return null;
+  const windows = Array.isArray(value.windows)
+    ? value.windows.flatMap((item) => {
+        const window = toQuotaWindow(item);
+        return window ? [window] : [];
+      })
+    : [];
   return {
     id,
     planId: offer.id,
     name: offer.name,
+    description: offer.description,
     price: offer.price,
     validityDays: offer.validityDays,
     status: asString(value.status),
+    startsAt: asString(value.starts_at),
     expiresAt: asString(value.expires_at),
+    groupNames: offer.groupNames,
+    windows,
   };
+}
+
+export function formatSharedAmount(value: number): string {
+  if (!Number.isFinite(value)) return "";
+  const digits = Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 6 : Math.abs(value) < 1 ? 4 : 2;
+  return value.toFixed(digits).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+export function formatSharedPrice(value: number): string {
+  const amount = formatSharedAmount(value);
+  return amount ? `${amount} 元` : "";
+}
+
+export function formatSharedDateTime(value: string, locale: string): string {
+  const time = Date.parse(value);
+  if (!Number.isFinite(time)) return "";
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(time);
+}
+
+export function remainingSharedDays(expiresAt: string, now = Date.now()): number | null {
+  const time = Date.parse(expiresAt);
+  if (!Number.isFinite(time)) return null;
+  const duration = time - now;
+  if (duration <= 0) return 0;
+  return Math.ceil(duration / 86_400_000);
+}
+
+export function limitedSharedWindows(windows: readonly SharedQuotaWindow[]): SharedQuotaWindow[] {
+  return windows.filter((window) => window.limit !== null && window.limit > 0);
+}
+
+export function sharedWindowUsagePercent(window: Pick<SharedQuotaWindow, "limit" | "used" | "reserved">): number {
+  if (window.limit === null || window.limit <= 0) return 0;
+  return Math.min(100, Math.max(0, ((window.used + window.reserved) / window.limit) * 100));
+}
+
+export function sharedPlanLimit(
+  plan: Pick<SharedPlanOffer, "dailyLimit" | "weeklyLimit" | "monthlyLimit">,
+  kind: SharedQuotaKind,
+): number | null {
+  if (kind === "daily") return plan.dailyLimit;
+  if (kind === "weekly") return plan.weeklyLimit;
+  return plan.monthlyLimit;
 }
 
 function listFrom(value: unknown): unknown[] {
@@ -102,13 +192,25 @@ export async function loadSharedAccountBilling(input: {
   session: AccountSession;
   baseUrl?: string;
 }): Promise<AccountBillingView> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   const [profile, sharedSubscriptions, sharedPlans] = await Promise.all([
     getJson(input.fetchImpl, `${baseUrl}/user/profile`, input.session),
     getJson(input.fetchImpl, `${baseUrl}/shared-subscriptions`, input.session),
     getJson(input.fetchImpl, `${baseUrl}/shared-subscriptions/plans`, input.session),
   ]);
   return projectSharedAccountBilling({ profile, sharedSubscriptions, sharedPlans });
+}
+
+export function hasCurrentSharedSubscription(
+  entitlements: ReadonlyArray<Pick<SharedEntitlement, "status">>,
+): boolean {
+  return entitlements.some((item) => item.status !== "revoked" && item.status !== "expired");
+}
+
+export function paymentLaunchUrl(order: Pick<PaymentOrderStart, "payUrl">): string {
+  const url = order.payUrl.trim();
+  if (url.startsWith("https://") || url.startsWith("http://")) return url;
+  return "";
 }
 
 function orderFromPayload(
@@ -137,7 +239,7 @@ export async function startBalanceRecharge(input: {
   paymentType: string;
   baseUrl?: string;
 }): Promise<PaymentOrderStart> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   const { response, body } = await postJson(
     input.fetchImpl,
     `${baseUrl}/payment/orders`,
@@ -164,7 +266,7 @@ export async function startSharedPlanPurchase(input: {
   renewSubscriptionId?: number;
   baseUrl?: string;
 }): Promise<PaymentOrderStart> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   const { response, body } = await postJson(
     input.fetchImpl,
     `${baseUrl}/payment/orders`,
@@ -189,7 +291,7 @@ export async function loadPublicLoginSettings(input: {
   fetchImpl: FetchLike;
   baseUrl?: string;
 }): Promise<PublicLoginSettings> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   const response = await input.fetchImpl(`${baseUrl}/settings/public`, {
     method: "GET",
     headers: { accept: "application/json" },
@@ -210,7 +312,7 @@ export async function loadPaymentMethods(input: {
   session: AccountSession;
   baseUrl?: string;
 }): Promise<PaymentMethodOption[]> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   const payload = await getJson(input.fetchImpl, `${baseUrl}/payment/config`, input.session);
   const record = asRecord(payload);
   const types = Array.isArray(record?.enabled_payment_types) ? record.enabled_payment_types : [];

@@ -4,6 +4,7 @@ import {
   Settings,
   Settings2,
   Wallet,
+  CreditCard,
   Package,
   Bot,
   Palette,
@@ -68,6 +69,12 @@ const BASE_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     id: "account",
     icon: Wallet,
     titleId: "settings.accountTitle",
+    groupId: "basics",
+  },
+  {
+    id: "subscription",
+    icon: CreditCard,
+    titleId: "settings.subscriptionTitle",
     groupId: "basics",
   },
   {

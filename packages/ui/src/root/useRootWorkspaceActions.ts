@@ -15,6 +15,7 @@ import { reportAppTelemetryEvent } from "@/lib/appTelemetry.js";
 import { resolveLogoutProviderFamilyDomain } from "@/lib/providerFamilyDomainSettings.js";
 import { isRendererReloadNavigation } from "@/lib/rendererNavigation.js";
 import { parseWslUncWorkspacePath } from "@/lib/wslUncWorkspace.js";
+import { writeBrowserAccountSession, writeSyncedKeyId } from "@/account/mgooleAccount.js";
 import { logger } from "@/logger.js";
 import { openFolderFromWorkspaceEntry } from "@/root/openWorkspaceFolderEntry.js";
 import { useConversationWorkspaceActions } from "@/root/useConversationWorkspaceActions.js";
@@ -338,6 +339,8 @@ export function useRootWorkspaceActions({
     }
     // ZAI/BigModel provider 已恢复为 App 登录镜像。
     // 派生 Coding/Start key 由 OAuth logout 的 host hook 统一清理，Root 只负责刷新展示态。
+    writeBrowserAccountSession(null);
+    writeSyncedKeyId(null);
     setOAuthError(null);
     setUser(null);
     // 退出登录后刷新 Account Source 与 Registry，避免继续展示退出前的 Provider 状态。

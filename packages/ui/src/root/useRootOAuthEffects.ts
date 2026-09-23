@@ -22,6 +22,7 @@ import {
   refreshLatestModelProviderFamilySelectionAfterLogin,
   refreshRestoredOAuthProviderFamilyAfterStartup,
 } from "@/root/oauthProviderFamilySelectionRefresh.js";
+import { readBrowserAccountSession, userInfoFromAccountSession } from "@/account/mgooleAccount.js";
 import { applyCachedOAuthSessionRestoreResult } from "@/root/oauthCachedSessionRestore.js";
 import { markZcodeJwtInvalidRestart } from "@/root/zcodeJwtInvalidRestartMarker.js";
 import { shouldApplyOAuthPollingFailure } from "@/root/oauthLoginAttemptGuard.js";
@@ -162,6 +163,11 @@ export function useRootOAuthEffects({
       // sidebar 会先按 user=null 渲染成“登录”，而登录弹窗又还能读到本地 activeProvider，
       // 用户就会看到“外面未登录、弹窗里已登录提供方”的分裂展示。
       // 这里在恢复主流程结束后立刻落定状态，让 footer 先显示 loading，再收敛到最终登录态。
+      const accountSession = readBrowserAccountSession();
+      if (accountSession) {
+        setUser(userInfoFromAccountSession(accountSession));
+        hasRestoredUser = true;
+      }
       setIsRestoringOAuthSession(false);
 
       try {

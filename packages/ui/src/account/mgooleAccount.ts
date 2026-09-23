@@ -4,6 +4,24 @@
  */
 
 export const MGOOLE_ACCOUNT_API_BASE = "https://mgoole.com/api/v1";
+const DEV_ACCOUNT_PROXY_ORIGINS = new Set(["http://127.0.0.1:5174", "http://localhost:5174"]);
+
+function readPageOrigin(): string {
+  if (typeof globalThis.location === "undefined") return "";
+  return globalThis.location.origin ?? "";
+}
+
+// 桌面开发页来自 Vite。浏览器不允许这个源直接请求 mgoole.com，改走同源代理。
+export function resolveAccountApiBase(explicit?: string, pageOrigin = readPageOrigin()): string {
+  if (explicit) return explicit.replace(/\/+$/, "");
+  if (DEV_ACCOUNT_PROXY_ORIGINS.has(pageOrigin)) {
+    return `${pageOrigin}/mgoole-api/api/v1`;
+  }
+  return MGOOLE_ACCOUNT_API_BASE;
+}
+
+// 不能把 window.fetch 拆出来再调用，浏览器会报 Illegal invocation。
+export const accountPageFetch: FetchLike = (input, init) => globalThis.fetch(input, init);
 export const MGOOLE_ACCOUNT_SESSION_KEY = "zcode.mgooleAccount.session";
 export const MGOOLE_SYNCED_KEY_ID_KEY = "zcode.mgooleAccount.syncedKeyId";
 
@@ -13,6 +31,12 @@ export interface CaptchaProof {
   turnstileToken?: string;
   tencentCaptchaTicket?: string;
   tencentCaptchaRandstr?: string;
+}
+
+export interface AccountUserInfo {
+  id: string;
+  username: string;
+  displayName: string;
 }
 
 export interface AccountSession {
@@ -37,6 +61,8 @@ export interface AccountApiKey {
   status: string;
   expiresAt: string | null;
   updatedAt: string;
+  groupId: number | null;
+  groupName: string;
 }
 
 export interface MgooleModelCredential {
@@ -46,22 +72,41 @@ export interface MgooleModelCredential {
   keyName: string;
 }
 
+export type SharedQuotaKind = "daily" | "weekly" | "monthly";
+
+export interface SharedQuotaWindow {
+  kind: SharedQuotaKind;
+  limit: number | null;
+  used: number;
+  reserved: number;
+  resetsAt: string;
+}
+
 export interface SharedEntitlement {
   id: number;
   planId: number;
   name: string;
+  description: string;
   price: number;
   validityDays: number;
   status: string;
+  startsAt: string;
   expiresAt: string;
+  groupNames: string[];
+  windows: SharedQuotaWindow[];
 }
 
 export interface SharedPlanOffer {
   id: number;
   name: string;
+  description: string;
   price: number;
   validityDays: number;
   forSale: boolean;
+  groupNames: string[];
+  dailyLimit: number | null;
+  weeklyLimit: number | null;
+  monthlyLimit: number | null;
 }
 
 export interface AccountBillingView {
@@ -119,6 +164,16 @@ function rejected(message: string): LoginResult {
 
 export function sessionFromLoginResult(result: LoginResult): AccountSession | null {
   return result.kind === "session" ? result.session : null;
+}
+
+export function userInfoFromAccountSession(session: AccountSession): AccountUserInfo {
+  const email = session.email.trim();
+  const label = email || (session.userId != null ? `user-${session.userId}` : "芒果AI");
+  return {
+    id: session.userId != null ? String(session.userId) : email || "mgoole-account",
+    username: label,
+    displayName: label,
+  };
 }
 
 function sessionFromAuthData(data: Record<string, unknown>): AccountSession | null {
@@ -235,7 +290,7 @@ export async function loginMgooleAccount(input: {
   captcha?: CaptchaProof;
   baseUrl?: string;
 }): Promise<LoginResult> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   let response: Response;
   let body: unknown;
   try {
@@ -260,7 +315,7 @@ export async function completeMgooleLogin2FA(input: {
   totpCode: string;
   baseUrl?: string;
 }): Promise<LoginResult> {
-  const baseUrl = (input.baseUrl ?? MGOOLE_ACCOUNT_API_BASE).replace(/\/+$/, "");
+  const baseUrl = resolveAccountApiBase(input.baseUrl);
   let response: Response;
   let body: unknown;
   try {
@@ -283,14 +338,27 @@ export async function completeMgooleLogin2FA(input: {
 
 export {
   isUsableAccountApiKey,
+  listAccountApiKeys,
+  modelIdsFromModelsPayload,
   persistSyncedMgooleCredential,
+  planGroupKeySync,
+  resolveAccountOpenAiBaseUrl,
   selectMgooleModelCredential,
   syncMgooleModelCredential,
 } from "./mgooleAccountKeys.js";
 export {
+  formatSharedAmount,
+  formatSharedDateTime,
+  formatSharedPrice,
+  hasCurrentSharedSubscription,
+  limitedSharedWindows,
   loadPaymentMethods,
+  remainingSharedDays,
+  sharedPlanLimit,
+  sharedWindowUsagePercent,
   loadPublicLoginSettings,
   loadSharedAccountBilling,
+  paymentLaunchUrl,
   projectSharedAccountBilling,
   startBalanceRecharge,
   startSharedPlanPurchase,
